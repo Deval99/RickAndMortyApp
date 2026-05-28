@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  Image,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import images from '../assets/images';
 
 interface Props {
   value: string;
@@ -62,7 +63,7 @@ export function SearchBar({
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <View style={styles.clearIcon}>
-            <Text style={styles.clearText}>×</Text>
+            <Image source={images.icClose} style={styles.clearImage} resizeMode="contain" />
           </View>
         </TouchableOpacity>
       )}
@@ -97,10 +98,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  clearText: {
-    color: '#fff',
-    fontSize: 14,
-    lineHeight: 18,
-    fontWeight: '700',
+  clearImage: {
+    width: 12,
+    height: 12,
+    tintColor: '#fff',
   },
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -44,17 +44,17 @@ export function FilterBar({
   return (
     <View style={styles.wrapper}>
       {/* Status row */}
-      <ScrollView
+      <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.row}
         accessibilityLabel="Filter by status"
-      >
-        {STATUS_OPTIONS.map(opt => {
+        data={STATUS_OPTIONS}
+        keyExtractor={opt => `status-${opt.value}`}
+        renderItem={({ item: opt }) => {
           const active = selectedStatus === opt.value;
           return (
             <TouchableOpacity
-              key={`status-${opt.value}`}
               style={[styles.chip, active && styles.chipActive]}
               onPress={() => onStatusChange(opt.value)}
               accessibilityRole="button"
@@ -66,21 +66,21 @@ export function FilterBar({
               </Text>
             </TouchableOpacity>
           );
-        })}
-      </ScrollView>
+        }}
+      />
 
       {/* Gender row */}
-      <ScrollView
+      <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.row}
         accessibilityLabel="Filter by gender"
-      >
-        {GENDER_OPTIONS.map(opt => {
+        data={GENDER_OPTIONS}
+        keyExtractor={opt => `gender-${opt.value}`}
+        renderItem={({ item: opt }) => {
           const active = selectedGender === opt.value;
           return (
             <TouchableOpacity
-              key={`gender-${opt.value}`}
               style={[styles.chip, active && styles.chipActive]}
               onPress={() => onGenderChange(opt.value)}
               accessibilityRole="button"
@@ -92,8 +92,8 @@ export function FilterBar({
               </Text>
             </TouchableOpacity>
           );
-        })}
-      </ScrollView>
+        }}
+      />
     </View>
   );
 }

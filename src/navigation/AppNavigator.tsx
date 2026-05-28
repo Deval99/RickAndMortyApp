@@ -2,7 +2,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { Text } from 'react-native';
+import { Image } from 'react-native';
+import images from '../assets/images';
 import { CharacterDetailScreen } from '../screens/CharacterDetailScreen';
 import { CharacterListScreen } from '../screens/CharacterListScreen';
 import { EpisodeDetailScreen } from '../screens/EpisodeDetailScreen';
@@ -34,17 +35,21 @@ export type TabParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
+const TAB_ICONS: Record<string, ReturnType<typeof require>> = {
+  Characters: images.icCharacter,
+  Episodes: images.icEpisodes,
+  Locations: images.icLocation,
+  Favourites: images.icFavouriteFilled,
+};
+
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Characters: '👤',
-    Episodes: '📺',
-    Locations: '🌍',
-    Favourites: '♥',
-  };
+  const source = TAB_ICONS[label] ?? images.icCharacter;
   return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
-      {icons[label] ?? '●'}
-    </Text>
+    <Image
+      source={source}
+      style={{ width: 24, height: 24, opacity: focused ? 1 : 0.8 }}
+      resizeMode="contain"
+    />
   );
 }
 

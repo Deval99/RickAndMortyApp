@@ -4,12 +4,14 @@ import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   ListRenderItem,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import images from '../../assets/images';
 import { CharacterCard } from '../../components/CharacterCard';
 import { useFavourites } from '../../hooks/useFavourites';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
@@ -75,10 +77,10 @@ function Header() {
 function EmptyState() {
   return (
     <View style={styles.centered}>
-      <Text style={styles.emptyIcon}>♡</Text>
+      <Image source={images.icFavourite} style={styles.emptyIcon} resizeMode="contain" />
       <Text style={styles.emptyTitle}>No favourites yet</Text>
       <Text style={styles.emptySubtitle}>
-        Open a character and tap ♡ to save them here.{'\n'}
+        Open a character and tap the heart to save them here.{'\n'}
         They'll be available even without internet.
       </Text>
     </View>
@@ -114,9 +116,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   emptyIcon: {
-    fontSize: 56,
-    color: '#E53935',
-    lineHeight: 64,
+    width: 64,
+    height: 64,
+    tintColor: '#E53935',
   },
   emptyTitle: {
     fontSize: 20,

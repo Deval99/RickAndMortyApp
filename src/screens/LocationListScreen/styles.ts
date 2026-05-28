@@ -84,8 +84,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconText: {
-    fontSize: 20,
+  iconImage: {
+    width: 24,
+    height: 24,
+    tintColor: ACCENT,
   },
   cardInfo: {
     flex: 1,
@@ -125,8 +127,9 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   chevron: {
-    fontSize: 20,
-    color: '#ccc',
-    fontWeight: '300',
+    width: 18,
+    height: 18,
+    tintColor: '#ccc',
+    transform: [{ rotate: '180deg' }],
   },
 });

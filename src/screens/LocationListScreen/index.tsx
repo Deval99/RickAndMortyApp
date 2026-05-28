@@ -4,12 +4,14 @@ import React, { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   ListRenderItem,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import images from '../../assets/images';
 import { useInfiniteLocations } from '../../hooks/useInfiniteLocations';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { RMLocation } from '../../types/location';
@@ -19,22 +21,6 @@ type TabProps = BottomTabScreenProps<TabParamList, 'LocationList'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
-/** Pick a representative emoji for a location type */
-function locationIcon(type: string): string {
-  const t = type.toLowerCase();
-  if (t.includes('planet')) return '🪐';
-  if (t.includes('space')) return '🚀';
-  if (t.includes('microverse') || t.includes('micro')) return '🔬';
-  if (t.includes('dream')) return '💭';
-  if (t.includes('resort')) return '🏖️';
-  if (t.includes('fantasy')) return '🧙';
-  if (t.includes('dimension')) return '🌀';
-  if (t.includes('cluster')) return '✨';
-  if (t.includes('game')) return '🎮';
-  if (t.includes('tv')) return '📺';
-  if (t.includes('unknown')) return '❓';
-  return '🌍';
-}
 
 export function LocationListScreen({ navigation }: Props) {
   const {
@@ -153,7 +139,7 @@ function LocationCard({ location, onPress }: LocationCardProps) {
     >
       <View style={styles.cardTop}>
         <View style={styles.iconCircle}>
-          <Text style={styles.iconText}>{locationIcon(location.type)}</Text>
+          <Image source={images.icLocation} style={styles.iconImage} resizeMode="contain" />
         </View>
         <View style={styles.cardInfo}>
           <Text style={styles.cardName} numberOfLines={1}>
@@ -171,10 +157,10 @@ function LocationCard({ location, onPress }: LocationCardProps) {
       <View style={styles.cardBottom}>
         <View style={styles.residentsBadge}>
           <Text style={styles.residentsText}>
-            👥 {location.residents.length} resident{location.residents.length !== 1 ? 's' : ''}
+            {location.residents.length} resident{location.residents.length !== 1 ? 's' : ''}
           </Text>
         </View>
-        <Text style={styles.chevron}>›</Text>
+        <Image source={images.icLeftArrow} style={styles.chevron} resizeMode="contain" />
       </View>
     </TouchableOpacity>
   );

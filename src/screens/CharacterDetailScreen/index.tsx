@@ -2,6 +2,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   Image,
   ScrollView,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import images from '../../assets/images';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useCharacter } from '../../hooks/useCharacter';
 import { useFavourite } from '../../hooks/useFavourite';
@@ -113,18 +115,18 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
         {/* ── Episodes ── */}
         <View style={styles.card}>
           <SectionTitle title={`Episodes (${character.episode.length})`} />
-          <ScrollView
+          <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.episodeList}
             accessibilityLabel="Episodes list"
-          >
-            {character.episode.map(url => {
+            data={character.episode}
+            keyExtractor={url => url}
+            renderItem={({ item: url }) => {
               const match = url.match(/\/episode\/(\d+)$/);
               const episodeId = match ? Number(match[1]) : null;
               return (
                 <TouchableOpacity
-                  key={url}
                   style={styles.episodeChip}
                   activeOpacity={0.7}
                   accessibilityRole="button"
@@ -138,8 +140,8 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
                   <Text style={styles.episodeText}>{episodeLabel(url)}</Text>
                 </TouchableOpacity>
               );
-            })}
-          </ScrollView>
+            }}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -165,7 +167,7 @@ function Header({ onBack, title, isFavourite, onToggle }: HeaderProps) {
         accessibilityLabel="Go back"
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <Text style={styles.backIcon}>‹</Text>
+        <Image source={images.icLeftArrow} style={styles.backIcon} resizeMode="contain" />
       </TouchableOpacity>
 
       <Text style={styles.headerTitle} numberOfLines={1}>
@@ -180,9 +182,11 @@ function Header({ onBack, title, isFavourite, onToggle }: HeaderProps) {
         accessibilityState={{ checked: isFavourite }}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <Text style={[styles.favIcon, isFavourite && styles.favIconActive]}>
-          {isFavourite ? '♥' : '♡'}
-        </Text>
+        <Image
+          source={isFavourite ? images.icFavouriteFilled : images.icFavourite}
+          style={[styles.favIcon, isFavourite && styles.favIconActive]}
+          resizeMode="contain"
+        />
       </TouchableOpacity>
     </View>
   );
@@ -241,10 +245,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   backIcon: {
-    fontSize: 32,
-    color: '#1a1a2e',
-    lineHeight: 36,
-    fontWeight: '300',
+    width: 24,
+    height: 24,
+    tintColor: '#1a1a2e',
   },
   headerTitle: {
     flex: 1,
@@ -259,11 +262,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   favIcon: {
-    fontSize: 26,
-    color: '#ccc',
+    width: 26,
+    height: 26,
+    tintColor: '#ccc',
   },
   favIconActive: {
-    color: '#E53935',
+    tintColor: '#E53935',
   },
 
   // Scroll content

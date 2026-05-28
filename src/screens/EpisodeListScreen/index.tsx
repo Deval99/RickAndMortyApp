@@ -3,6 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
+  Image,
   SectionList,
   SectionListRenderItem,
   StyleSheet,
@@ -11,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import images from '../../assets/images';
 import type { TabParamList } from '../../navigation/AppNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import type { Episode } from '../../types/episode';
@@ -140,7 +142,7 @@ function EpisodeRow({ episode, onPress }: EpisodeRowProps) {
         </Text>
         <Text style={styles.rowMeta}>{episode.air_date}</Text>
       </View>
-      <Text style={styles.rowChevron}>›</Text>
+      <Image source={images.icLeftArrow} style={styles.rowChevron} resizeMode="contain" />
     </TouchableOpacity>
   );
 }
@@ -247,9 +249,10 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   rowChevron: {
-    fontSize: 22,
-    color: '#ccc',
-    fontWeight: '300',
+    width: 18,
+    height: 18,
+    tintColor: '#ccc',
+    transform: [{ rotate: '180deg' }],
   },
   loadingText: {
     fontSize: 14,

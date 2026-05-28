@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import images from '../../assets/images';
 import { useLocationWithResidents } from '../../hooks/useLocationWithResidents';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import type { Character } from '../../types/character';
@@ -65,7 +66,7 @@ export function LocationDetailScreen({ route, navigation }: Props) {
       <View style={styles.metaCard}>
         <View style={styles.metaIconRow}>
           <View style={styles.metaIconCircle}>
-            <Text style={styles.metaIcon}>🌍</Text>
+            <Image source={images.icLocation} style={styles.metaIcon} resizeMode="contain" />
           </View>
           <View style={styles.metaTextBlock}>
             <Text style={styles.metaName}>{location.name}</Text>
@@ -138,7 +139,7 @@ function Header({ title, onBack }: HeaderProps) {
         accessibilityLabel="Go back"
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <Text style={styles.backIcon}>‹</Text>
+        <Image source={images.icLeftArrow} style={styles.backIcon} resizeMode="contain" />
       </TouchableOpacity>
       <Text style={styles.headerTitle} numberOfLines={1}>
         {title}
@@ -234,10 +235,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   backIcon: {
-    fontSize: 32,
-    color: '#1a1a2e',
-    lineHeight: 36,
-    fontWeight: '300',
+    width: 24,
+    height: 24,
+    tintColor: '#1a1a2e',
   },
   headerTitle: {
     flex: 1,
@@ -277,7 +277,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   metaIcon: {
-    fontSize: 26,
+    width: 28,
+    height: 28,
+    tintColor: ACCENT,
   },
   metaTextBlock: {
     flex: 1,
