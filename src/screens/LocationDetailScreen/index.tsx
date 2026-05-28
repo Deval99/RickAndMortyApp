@@ -1,7 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   ListRenderItem,
@@ -12,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '../../assets/images';
+import { AvatarGridSkeleton } from '../../components/SkeletonLoader';
 import { useLocationWithResidents } from '../../hooks/useLocationWithResidents';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import type { Character } from '../../types/character';
@@ -30,9 +30,23 @@ export function LocationDetailScreen({ route, navigation }: Props) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <Header title="" onBack={() => navigation.goBack()} />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={ACCENT} />
+        {/* Meta card skeleton */}
+        <View style={[styles.metaCard, { gap: 10 }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#e0e0e0' }} />
+            <View style={{ flex: 1, gap: 6 }}>
+              <View style={{ width: '60%', height: 18, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
+            </View>
+          </View>
+          <View style={{ width: '100%', height: 1, backgroundColor: '#f0f0f0' }} />
+          {[1, 2].map(i => (
+            <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{ width: '30%', height: 14, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
+              <View style={{ width: '45%', height: 14, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
+            </View>
+          ))}
         </View>
+        <AvatarGridSkeleton count={9} />
       </SafeAreaView>
     );
   }
@@ -82,9 +96,6 @@ export function LocationDetailScreen({ route, navigation }: Props) {
           <Text style={styles.residentCountLabel}>
             {location.residents.length} resident{location.residents.length !== 1 ? 's' : ''}
           </Text>
-          {residents.length > 0 && residents.length < location.residents.length && (
-            <ActivityIndicator size="small" color={ACCENT} />
-          )}
         </View>
       </View>
 
@@ -182,9 +193,7 @@ function CharacterAvatar({ character, onPress }: CharacterAvatarProps) {
     >
       <View style={styles.avatarImageWrapper}>
         {!loaded && !errored && (
-          <View style={styles.avatarPlaceholder}>
-            <ActivityIndicator size="small" color={ACCENT} />
-          </View>
+          <View style={styles.avatarPlaceholder} />
         )}
         {errored ? (
           <View style={[styles.avatarPlaceholder, styles.avatarError]}>

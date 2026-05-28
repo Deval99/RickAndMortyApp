@@ -1,7 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   ListRenderItem,
@@ -12,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '../../assets/images';
+import { AvatarGridSkeleton } from '../../components/SkeletonLoader';
 import { useEpisodeWithCharacters } from '../../hooks/useEpisodeWithCharacters';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import type { Character } from '../../types/character';
@@ -28,9 +28,18 @@ export function EpisodeDetailScreen({ route, navigation }: Props) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <Header title="" onBack={() => navigation.goBack()} />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={ACCENT} />
+        {/* Episode meta skeleton */}
+        <View style={[styles.metaCard, { gap: 10 }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ width: 60, height: 36, borderRadius: 8, backgroundColor: '#e0e0e0' }} />
+            <View style={{ flex: 1, gap: 6 }}>
+              <View style={{ width: '70%', height: 16, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
+              <View style={{ width: '40%', height: 13, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
+            </View>
+          </View>
+          <View style={{ width: '50%', height: 13, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
         </View>
+        <AvatarGridSkeleton count={9} />
       </SafeAreaView>
     );
   }
@@ -145,9 +154,7 @@ function CharacterAvatar({ character, onPress }: CharacterAvatarProps) {
       <View style={styles.avatarImageWrapper}>
         {/* Placeholder shown until image loads */}
         {!loaded && !errored && (
-          <View style={styles.avatarPlaceholder}>
-            <ActivityIndicator size="small" color={ACCENT} />
-          </View>
+          <View style={styles.avatarPlaceholder} />
         )}
         {errored ? (
           <View style={[styles.avatarPlaceholder, styles.avatarError]}>

@@ -2,7 +2,6 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   ListRenderItem,
@@ -10,9 +9,10 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../assets/images';
 import { CharacterCard } from '../../components/CharacterCard';
+import { CharacterListSkeleton } from '../../components/SkeletonLoader';
 import { useFavourites } from '../../hooks/useFavourites';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { Character } from '../../types/character';
@@ -22,6 +22,7 @@ type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 export function FavouritesScreen({ navigation }: Props) {
+  const { top } = useSafeAreaInsets();
   const { characters, isLoading, reload } = useFavourites();
 
   // Reload whenever the tab comes into focus so removals on the detail screen
@@ -40,17 +41,15 @@ export function FavouritesScreen({ navigation }: Props) {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={[styles.safeArea, { paddingTop: top }]}>
         <Header />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#00b5cc" />
-        </View>
-      </SafeAreaView>
+        <CharacterListSkeleton count={4} />
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <View style={[styles.safeArea, { paddingTop: top }]}>
       <Header />
       <FlatList
         data={characters}
@@ -62,7 +61,7 @@ export function FavouritesScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={<EmptyState />}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

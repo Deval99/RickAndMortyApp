@@ -2,7 +2,6 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   ListRenderItem,
@@ -10,8 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../assets/images';
+import { LocationListSkeleton } from '../../components/SkeletonLoader';
 import { useInfiniteLocations } from '../../hooks/useInfiniteLocations';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { RMLocation } from '../../types/location';
@@ -23,6 +23,7 @@ type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 
 export function LocationListScreen({ navigation }: Props) {
+  const { top } = useSafeAreaInsets();
   const {
     data,
     fetchNextPage,
@@ -61,20 +62,12 @@ export function LocationListScreen({ navigation }: Props) {
 
   const ListFooter = useCallback(() => {
     if (!isFetchingNextPage) return null;
-    return (
-      <View style={styles.footer}>
-        <ActivityIndicator size="small" color={ACCENT} />
-      </View>
-    );
+    return <View style={styles.footer} />;
   }, [isFetchingNextPage]);
 
   const ListEmpty = useCallback(() => {
     if (isLoading) {
-      return (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={ACCENT} />
-        </View>
-      );
+      return <LocationListSkeleton count={6} />;
     }
     if (isError) {
       return (
@@ -96,7 +89,7 @@ export function LocationListScreen({ navigation }: Props) {
   }, [isLoading, isError, error, refetch]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <View style={[styles.safeArea, { paddingTop: top }]}>
       <View style={styles.header}>
         <Text style={styles.title}>Locations</Text>
         {totalCount > 0 && (
@@ -117,7 +110,7 @@ export function LocationListScreen({ navigation }: Props) {
         }
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

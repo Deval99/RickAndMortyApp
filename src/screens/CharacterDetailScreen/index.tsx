@@ -1,7 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   ScrollView,
@@ -13,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '../../assets/images';
 import { StatusBadge } from '../../components/StatusBadge';
+import { AvatarGridSkeleton } from '../../components/SkeletonLoader';
 import { useCharacter } from '../../hooks/useCharacter';
 import { useFavourite } from '../../hooks/useFavourite';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
@@ -35,9 +35,25 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <Header onBack={() => navigation.goBack()} title="" isFavourite={false} onToggle={() => {}} />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#00b5cc" />
-        </View>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Avatar skeleton */}
+          <View style={[styles.avatar, { backgroundColor: '#e0e0e0' }]} />
+          {/* Name + status skeleton */}
+          <View style={[styles.nameRow, { gap: 8 }]}>
+            <View style={{ width: '60%', height: 26, borderRadius: 6, backgroundColor: '#e0e0e0' }} />
+            <View style={{ width: 80, height: 22, borderRadius: 12, backgroundColor: '#e0e0e0' }} />
+          </View>
+          {/* Info card skeletons */}
+          <AvatarGridSkeleton count={0} />
+          {[1, 2, 3].map(i => (
+            <View key={i} style={[styles.card, { gap: 10 }]}>
+              <View style={{ width: '40%', height: 13, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
+              {[1, 2, 3].map(j => (
+                <View key={j} style={{ width: '100%', height: 14, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
+              ))}
+            </View>
+          ))}
+        </ScrollView>
       </SafeAreaView>
     );
   }

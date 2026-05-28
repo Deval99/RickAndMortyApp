@@ -1,0 +1,28 @@
+import { useEffect, useRef, useState } from 'react';
+
+/**
+ * useDebounce<T>
+ *
+ * Returns a debounced copy of `value` that only updates after `delayMs`
+ * milliseconds have elapsed since the last change.
+ *
+ * Written from scratch — no lodash dependency.
+ *
+ * @param value   The value to debounce.
+ * @param delayMs Debounce delay in milliseconds (default: 300).
+ */
+export function useDebounce<T>(value: T, delayMs: number = 300): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delayMs);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delayMs]);
+
+  return debouncedValue;
+}

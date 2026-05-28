@@ -2,16 +2,16 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   ListRenderItem,
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CharacterCard } from '../../components/CharacterCard';
 import { FilterBar } from '../../components/FilterBar';
 import { SearchBar } from '../../components/SearchBar';
+import { CharacterListSkeleton } from '../../components/SkeletonLoader';
 import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { Character, CharacterFilters } from '../../types/character';
@@ -37,6 +37,7 @@ function toApiGender(g: DisplayGender): CharacterFilters['gender'] | undefined {
 }
 
 export function CharacterListScreen({ navigation }: Props) {
+  const { top } = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<DisplayStatus>('');
   const [gender, setGender] = useState<DisplayGender>('');
@@ -81,20 +82,12 @@ export function CharacterListScreen({ navigation }: Props) {
 
   const ListFooter = () => {
     if (!isFetchingNextPage) return null;
-    return (
-      <View style={styles.footer}>
-        <ActivityIndicator size="small" color="#00b5cc" />
-      </View>
-    );
+    return <View style={styles.footer} />;
   };
 
   const ListEmpty = () => {
     if (isLoading) {
-      return (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#00b5cc" />
-        </View>
-      );
+      return <CharacterListSkeleton count={6} />;
     }
     if (isError) {
       return (
@@ -116,7 +109,7 @@ export function CharacterListScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <View style={[styles.safeArea, { paddingTop: top }]}>
       <View style={styles.header}>
         <Text style={styles.title}>Characters</Text>
       </View>
@@ -143,6 +136,6 @@ export function CharacterListScreen({ navigation }: Props) {
         }
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+    </View>
   );
 }

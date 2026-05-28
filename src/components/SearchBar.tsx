@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useDebounce } from '../hooks/useDebounce';
 import images from '../assets/images';
 
 interface Props {
@@ -21,25 +22,20 @@ export function SearchBar({
   debounceMs = 300,
   placeholder = 'Search characters…',
 }: Props) {
-  const [localValue, setLocalValue] = useState(value);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [localValue, setLocalValue] = useState<string>(value);
+  const debouncedValue = useDebounce<string>(localValue, debounceMs);
 
   // Keep local state in sync when parent resets the value externally
   useEffect(() => {
     setLocalValue(value);
   }, [value]);
 
-  const handleChange = (text: string) => {
-    setLocalValue(text);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      onChangeDebounced(text);
-    }, debounceMs);
-  };
+  useEffect(() => {
+    onChangeDebounced(debouncedValue);
+  }, [debouncedValue]);
 
   const handleClear = () => {
     setLocalValue('');
-    if (timerRef.current) clearTimeout(timerRef.current);
     onChangeDebounced('');
   };
 
@@ -48,7 +44,7 @@ export function SearchBar({
       <TextInput
         style={styles.input}
         value={localValue}
-        onChangeText={handleChange}
+        onChangeText={setLocalValue}
         placeholder={placeholder}
         placeholderTextColor="#aaa"
         returnKeyType="search"

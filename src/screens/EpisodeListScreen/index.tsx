@@ -2,7 +2,6 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import {
-  ActivityIndicator,
   Image,
   SectionList,
   SectionListRenderItem,
@@ -11,8 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../assets/images';
+import { EpisodeListSkeleton } from '../../components/SkeletonLoader';
 import type { TabParamList } from '../../navigation/AppNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import type { Episode } from '../../types/episode';
@@ -23,6 +23,7 @@ type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 export function EpisodeListScreen({ navigation }: Props) {
+  const { top } = useSafeAreaInsets();
   const { seasons, isLoading, isError, error, refetch, isLoadingAll, totalLoaded } =
     useAllEpisodes();
 
@@ -52,19 +53,16 @@ export function EpisodeListScreen({ navigation }: Props) {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={[styles.safeArea, { paddingTop: top }]}>
         <ScreenHeader />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={ACCENT} />
-          <Text style={styles.loadingText}>Loading episodes…</Text>
-        </View>
-      </SafeAreaView>
+        <EpisodeListSkeleton count={8} />
+      </View>
     );
   }
 
   if (isError) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={[styles.safeArea, { paddingTop: top }]}>
         <ScreenHeader />
         <View style={styles.centered}>
           <Text style={styles.errorText}>
@@ -78,18 +76,17 @@ export function EpisodeListScreen({ navigation }: Props) {
             <Text style={styles.retryText}>Tap to retry</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <View style={[styles.safeArea, { paddingTop: top }]}>
       <ScreenHeader />
 
       {/* Loading banner while fetching remaining pages */}
       {isLoadingAll && seasons.length > 0 && (
         <View style={styles.loadingBanner}>
-          <ActivityIndicator size="small" color={ACCENT} />
           <Text style={styles.loadingBannerText}>
             Loading… {totalLoaded} episodes so far
           </Text>
@@ -105,7 +102,7 @@ export function EpisodeListScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
