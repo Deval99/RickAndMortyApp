@@ -1,6 +1,6 @@
 import { useInfiniteQuery, UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query';
 import { LocationService } from '../services/LocationService';
-import type { RMLocation } from '../types/location';
+import type { FullLocation } from '../types/location';
 import type { ApiError, PaginatedResponse } from '../types/api';
 
 function getNextPageParam(
@@ -13,10 +13,10 @@ function getNextPageParam(
 }
 
 export function useInfiniteLocations(): UseInfiniteQueryResult<
-  InfiniteData<PaginatedResponse<RMLocation>>,
+  InfiniteData<PaginatedResponse<FullLocation>>,
   ApiError
 > {
-  return useInfiniteQuery<PaginatedResponse<RMLocation>, ApiError>({
+  return useInfiniteQuery<PaginatedResponse<FullLocation>, ApiError>({
     queryKey: ['locations', 'infinite'],
     queryFn: ({ pageParam }) => LocationService.getLocationsPage(pageParam as number),
     initialPageParam: 1,

@@ -14,7 +14,7 @@ import { FilterBar } from '../../components/FilterBar';
 import { SearchBar } from '../../components/SearchBar';
 import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
-import type { Character } from '../../types/character';
+import type { Character, CharacterFilters } from '../../types/character';
 import { styles } from './styles';
 
 // Tab screen props combined with root stack navigation for cross-stack navigation
@@ -22,19 +22,30 @@ type TabProps = BottomTabScreenProps<TabParamList, 'CharacterList'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
-type Status = Character['status'] | '';
-type Gender = Character['gender'] | '';
+// FilterBar uses display-cased values from Character; map them to lowercase API params
+type DisplayStatus = Character['status'] | '';
+type DisplayGender = Character['gender'] | '';
+
+function toApiStatus(s: DisplayStatus): CharacterFilters['status'] | undefined {
+  if (!s) return undefined;
+  return s.toLowerCase() as CharacterFilters['status'];
+}
+
+function toApiGender(g: DisplayGender): CharacterFilters['gender'] | undefined {
+  if (!g) return undefined;
+  return g.toLowerCase() as CharacterFilters['gender'];
+}
 
 export function CharacterListScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<Status>('');
-  const [gender, setGender] = useState<Gender>('');
+  const [status, setStatus] = useState<DisplayStatus>('');
+  const [gender, setGender] = useState<DisplayGender>('');
 
-  const filters = useMemo(
+  const filters = useMemo<CharacterFilters>(
     () => ({
       name: search || undefined,
-      status: (status || undefined) as Character['status'] | undefined,
-      gender: (gender || undefined) as Character['gender'] | undefined,
+      status: toApiStatus(status),
+      gender: toApiGender(gender),
     }),
     [search, status, gender],
   );

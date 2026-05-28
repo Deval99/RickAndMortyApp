@@ -1,4 +1,5 @@
-export interface RMLocation {
+/** Full location object returned by the /location endpoint */
+export interface FullLocation {
   id: number;
   name: string;
   type: string;
@@ -7,3 +8,6 @@ export interface RMLocation {
   url: string;
   created: string;
 }
+
+/** @deprecated Use FullLocation instead */
+export type RMLocation = FullLocation;

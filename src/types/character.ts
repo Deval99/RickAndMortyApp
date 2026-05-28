@@ -5,15 +5,24 @@ export interface Character {
   species: string;
   type: string;
   gender: 'Female' | 'Male' | 'Genderless' | 'unknown';
-  origin: Location;
-  location: Location;
+  origin: LocationRef;
+  location: LocationRef;
   image: string;
-  episode: string[];
+  episode: string[]; // array of episode URLs
   url: string;
   created: string;
 }
 
-export interface Location {
+/** Inline location reference embedded inside a Character response */
+export interface LocationRef {
   name: string;
   url: string;
+}
+
+/** Optional filter parameters accepted by the /character list endpoint */
+export interface CharacterFilters {
+  name?: string;
+  status?: 'alive' | 'dead' | 'unknown';
+  species?: string;
+  gender?: 'female' | 'male' | 'genderless' | 'unknown';
 }

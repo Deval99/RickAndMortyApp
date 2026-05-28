@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { LocationService } from '../services/LocationService';
 import { CharacterService } from '../services/CharacterService';
-import type { RMLocation } from '../types/location';
+import type { FullLocation } from '../types/location';
 import type { Character } from '../types/character';
 import type { ApiError } from '../types/api';
 
@@ -12,7 +12,7 @@ function extractCharacterId(url: string): number {
 }
 
 interface LocationWithResidents {
-  location: RMLocation | undefined;
+  location: FullLocation | undefined;
   residents: Character[];
   isLoading: boolean;
   isError: boolean;
@@ -22,7 +22,7 @@ interface LocationWithResidents {
 
 export function useLocationWithResidents(locationId: number): LocationWithResidents {
   // Step 1: fetch the location
-  const locationQuery = useQuery<RMLocation, ApiError>({
+  const locationQuery = useQuery<FullLocation, ApiError>({
     queryKey: ['location', locationId],
     queryFn: () => LocationService.getLocationById(locationId),
   });
