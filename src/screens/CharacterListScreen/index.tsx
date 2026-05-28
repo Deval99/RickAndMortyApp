@@ -1,3 +1,4 @@
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
@@ -12,11 +13,14 @@ import { CharacterCard } from '../../components/CharacterCard';
 import { FilterBar } from '../../components/FilterBar';
 import { SearchBar } from '../../components/SearchBar';
 import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
-import type { RootStackParamList } from '../../navigation/AppNavigator';
+import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { Character } from '../../types/character';
 import { styles } from './styles';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'CharacterList'>;
+// Tab screen props combined with root stack navigation for cross-stack navigation
+type TabProps = BottomTabScreenProps<TabParamList, 'CharacterList'>;
+type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
+type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 type Status = Character['status'] | '';
 type Gender = Character['gender'] | '';

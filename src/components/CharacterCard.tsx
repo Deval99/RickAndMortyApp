@@ -13,7 +13,7 @@ import type { Character } from '../types/character';
 
 interface Props {
   character: Character;
-  navigation?: NativeStackNavigationProp<RootStackParamList, 'CharacterList'>;
+  navigation?: NativeStackNavigationProp<RootStackParamList>;
 }
 
 export function CharacterCard({ character, navigation }: Props) {

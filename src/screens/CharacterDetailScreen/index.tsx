@@ -14,6 +14,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { useCharacter } from '../../hooks/useCharacter';
 import { useFavourite } from '../../hooks/useFavourite';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { navigateToDetail } from '../../utils/navigateToDetail';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CharacterDetail'>;
 
@@ -118,11 +119,26 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
             contentContainerStyle={styles.episodeList}
             accessibilityLabel="Episodes list"
           >
-            {character.episode.map(url => (
-              <View key={url} style={styles.episodeChip}>
-                <Text style={styles.episodeText}>{episodeLabel(url)}</Text>
-              </View>
-            ))}
+            {character.episode.map(url => {
+              const match = url.match(/\/episode\/(\d+)$/);
+              const episodeId = match ? Number(match[1]) : null;
+              return (
+                <TouchableOpacity
+                  key={url}
+                  style={styles.episodeChip}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Go to ${episodeLabel(url)}`}
+                  onPress={() => {
+                    if (episodeId !== null) {
+                      navigateToDetail(navigation, 'EpisodeDetail', { episodeId });
+                    }
+                  }}
+                >
+                  <Text style={styles.episodeText}>{episodeLabel(url)}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
       </ScrollView>

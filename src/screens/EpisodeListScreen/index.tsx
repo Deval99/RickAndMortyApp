@@ -1,0 +1,273 @@
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useCallback } from 'react';
+import {
+  ActivityIndicator,
+  SectionList,
+  SectionListRenderItem,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import type { TabParamList } from '../../navigation/AppNavigator';
+import type { RootStackParamList } from '../../navigation/AppNavigator';
+import type { Episode } from '../../types/episode';
+import { useAllEpisodes, type EpisodeSeason } from '../../hooks/useAllEpisodes';
+
+type TabProps = BottomTabScreenProps<TabParamList, 'EpisodesPaginated'>;
+type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
+type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
+
+export function EpisodeListScreen({ navigation }: Props) {
+  const { seasons, isLoading, isError, error, refetch, isLoadingAll, totalLoaded } =
+    useAllEpisodes();
+
+  const renderItem: SectionListRenderItem<Episode, EpisodeSeason> = useCallback(
+    ({ item }) => (
+      <EpisodeRow
+        episode={item}
+        onPress={() =>
+          navigation.navigate('EpisodeDetail', { episodeId: item.id })
+        }
+      />
+    ),
+    [navigation],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: EpisodeSeason }) => (
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{section.title}</Text>
+        <Text style={styles.sectionCount}>{section.data.length} episodes</Text>
+      </View>
+    ),
+    [],
+  );
+
+  const keyExtractor = useCallback((item: Episode) => String(item.id), []);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ScreenHeader />
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={ACCENT} />
+          <Text style={styles.loadingText}>Loading episodes…</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ScreenHeader />
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>
+            {(error as { message?: string })?.message ?? 'Failed to load episodes'}
+          </Text>
+          <TouchableOpacity
+            onPress={() => refetch()}
+            accessibilityRole="button"
+            style={styles.retryBtn}
+          >
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ScreenHeader />
+
+      {/* Loading banner while fetching remaining pages */}
+      {isLoadingAll && seasons.length > 0 && (
+        <View style={styles.loadingBanner}>
+          <ActivityIndicator size="small" color={ACCENT} />
+          <Text style={styles.loadingBannerText}>
+            Loading… {totalLoaded} episodes so far
+          </Text>
+        </View>
+      )}
+
+      <SectionList
+        sections={seasons}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        stickySectionHeadersEnabled
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+      />
+    </SafeAreaView>
+  );
+}
+
+// ─── Sub-components ──────────────────────────────────────────────────────────
+
+function ScreenHeader() {
+  return (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>Episodes</Text>
+    </View>
+  );
+}
+
+interface EpisodeRowProps {
+  episode: Episode;
+  onPress: () => void;
+}
+
+function EpisodeRow({ episode, onPress }: EpisodeRowProps) {
+  return (
+    <TouchableOpacity
+      style={styles.row}
+      onPress={onPress}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={`${episode.episode} – ${episode.name}`}
+    >
+      <View style={styles.episodeBadge}>
+        <Text style={styles.episodeCode}>{episode.episode}</Text>
+      </View>
+      <View style={styles.rowInfo}>
+        <Text style={styles.rowName} numberOfLines={1}>
+          {episode.name}
+        </Text>
+        <Text style={styles.rowMeta}>{episode.air_date}</Text>
+      </View>
+      <Text style={styles.rowChevron}>›</Text>
+    </TouchableOpacity>
+  );
+}
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const ACCENT = '#00b5cc';
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f7f8fa',
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#f7f8fa',
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#1a1a2e',
+  },
+  loadingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: ACCENT + '18',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  loadingBannerText: {
+    fontSize: 13,
+    color: ACCENT,
+    fontWeight: '600',
+  },
+  listContent: {
+    paddingBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f7f8fa',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#ddd',
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1a1a2e',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  sectionCount: {
+    fontSize: 12,
+    color: '#888',
+    fontWeight: '500',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#f0f0f0',
+    gap: 12,
+  },
+  episodeBadge: {
+    backgroundColor: ACCENT + '18',
+    borderWidth: 1.5,
+    borderColor: ACCENT,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  episodeCode: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: ACCENT,
+  },
+  rowInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  rowName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1a1a2e',
+  },
+  rowMeta: {
+    fontSize: 12,
+    color: '#888',
+  },
+  rowChevron: {
+    fontSize: 22,
+    color: '#ccc',
+    fontWeight: '300',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 8,
+  },
+  errorText: {
+    fontSize: 15,
+    color: '#D63D2E',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
+  retryBtn: {
+    marginTop: 4,
+  },
+  retryText: {
+    fontSize: 14,
+    color: ACCENT,
+    fontWeight: '600',
+  },
+});
