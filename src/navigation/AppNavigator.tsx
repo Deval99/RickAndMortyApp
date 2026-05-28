@@ -7,6 +7,7 @@ import { CharacterDetailScreen } from '../screens/CharacterDetailScreen';
 import { CharacterListScreen } from '../screens/CharacterListScreen';
 import { EpisodeDetailScreen } from '../screens/EpisodeDetailScreen';
 import { EpisodeListScreen } from '../screens/EpisodeListScreen';
+import { FavouritesScreen } from '../screens/FavouritesScreen';
 import { LocationDetailScreen } from '../screens/LocationDetailScreen';
 import { LocationListScreen } from '../screens/LocationListScreen';
 
@@ -25,6 +26,7 @@ export type TabParamList = {
   CharacterList: undefined;
   EpisodesPaginated: undefined;
   LocationList: undefined;
+  Favourites: undefined;
 };
 
 // ─── Navigators ──────────────────────────────────────────────────────────────
@@ -37,6 +39,7 @@ function TabIcon({ label, focused }: { label: string; focused: boolean }) {
     Characters: '👤',
     Episodes: '📺',
     Locations: '🌍',
+    Favourites: '♥',
   };
   return (
     <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
@@ -70,6 +73,7 @@ function TabNavigator() {
           let label = 'Characters';
           if (route.name === 'EpisodesPaginated') label = 'Episodes';
           if (route.name === 'LocationList') label = 'Locations';
+          if (route.name === 'Favourites') label = 'Favourites';
           return <TabIcon label={label} focused={focused} />;
         },
       })}
@@ -88,6 +92,11 @@ function TabNavigator() {
         name="LocationList"
         component={LocationListScreen}
         options={{ tabBarLabel: 'Locations' }}
+      />
+      <Tab.Screen
+        name="Favourites"
+        component={FavouritesScreen}
+        options={{ tabBarLabel: 'Favourites' }}
       />
     </Tab.Navigator>
   );

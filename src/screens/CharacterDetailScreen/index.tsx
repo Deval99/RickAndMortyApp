@@ -27,7 +27,7 @@ function episodeLabel(url: string): string {
 export function CharacterDetailScreen({ route, navigation }: Props) {
   const { characterId } = route.params;
   const { data: character, isLoading, isError, error, refetch } = useCharacter(characterId);
-  const { isFavourite, toggle } = useFavourite(characterId);
+  const { isFavourite, toggle } = useFavourite(characterId, character);
 
   if (isLoading) {
     return (
