@@ -1,3 +1,4 @@
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
   Image,
@@ -6,19 +7,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import { StatusBadge } from './StatusBadge';
 import type { Character } from '../types/character';
 
 interface Props {
   character: Character;
-  onPress?: (character: Character) => void;
+  navigation?: NativeStackNavigationProp<RootStackParamList, 'CharacterList'>;
 }
 
-export function CharacterCard({ character, onPress }: Props) {
+export function CharacterCard({ character, navigation }: Props) {
+  const handlePress = () => {
+    navigation?.navigate('CharacterDetail', { characterId: character.id });
+  };
+
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => onPress?.(character)}
+      onPress={handlePress}
       activeOpacity={0.85}
       accessibilityRole="button"
       accessibilityLabel={`${character.name}, ${character.status}`}

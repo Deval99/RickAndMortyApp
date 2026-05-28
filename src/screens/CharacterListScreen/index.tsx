@@ -1,3 +1,4 @@
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -11,13 +12,16 @@ import { CharacterCard } from '../../components/CharacterCard';
 import { FilterBar } from '../../components/FilterBar';
 import { SearchBar } from '../../components/SearchBar';
 import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
+import type { RootStackParamList } from '../../navigation/AppNavigator';
 import type { Character } from '../../types/character';
 import { styles } from './styles';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'CharacterList'>;
 
 type Status = Character['status'] | '';
 type Gender = Character['gender'] | '';
 
-export function CharacterListScreen() {
+export function CharacterListScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<Status>('');
   const [gender, setGender] = useState<Gender>('');
@@ -54,8 +58,8 @@ export function CharacterListScreen() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const renderItem: ListRenderItem<Character> = useCallback(
-    ({ item }) => <CharacterCard character={item} />,
-    [],
+    ({ item }) => <CharacterCard character={item} navigation={navigation} />,
+    [navigation],
   );
 
   const keyExtractor = useCallback((item: Character) => String(item.id), []);
