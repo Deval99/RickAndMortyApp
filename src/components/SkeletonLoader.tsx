@@ -1,5 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View, ViewStyle } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  cancelAnimation,
+} from 'react-native-reanimated';
 
 // ─── Primitive shimmer block ──────────────────────────────────────────────────
 
@@ -11,26 +19,23 @@ interface ShimmerProps {
 }
 
 function Shimmer({ width, height, borderRadius = 6, style }: ShimmerProps) {
-  const opacity = useRef(new Animated.Value(0.4)).current;
+  const opacity = useSharedValue(0.4);
 
   useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0.4,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-      ]),
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 700 }),
+        withTiming(0.4, { duration: 700 }),
+      ),
+      -1,
+      false,
     );
-    pulse.start();
-    return () => pulse.stop();
+    return () => cancelAnimation(opacity);
   }, [opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   return (
     <Animated.View
@@ -40,8 +45,8 @@ function Shimmer({ width, height, borderRadius = 6, style }: ShimmerProps) {
           height,
           borderRadius,
           backgroundColor: '#e0e0e0',
-          opacity,
         },
+        animatedStyle,
         style,
       ]}
     />
@@ -54,7 +59,7 @@ export function CharacterCardSkeleton() {
   return (
     <View style={styles.card}>
       {/* Avatar placeholder */}
-      <Shimmer width={100} height={100} borderRadius={0} />
+      <Shimmer width={100} height={102} borderRadius={0} />
       {/* Text lines */}
       <View style={styles.info}>
         <Shimmer width="70%" height={16} />
@@ -222,7 +227,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 12,
     gap: 8,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   avatarCard: {
     width: '30%',

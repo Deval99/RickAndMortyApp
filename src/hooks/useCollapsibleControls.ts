@@ -1,62 +1,64 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import {
-  Animated,
-} from 'react-native';
+import { useCallback, useState } from 'react';
 import type {
   LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ViewProps,
 } from 'react-native';
+import { useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
 
 export function useCollapsibleControls() {
-  const [controlsHeight, setControlsHeight] = useState(0);
   const [areControlsTouchable, setAreControlsTouchable] = useState(true);
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollY = useSharedValue(0);
+  const controlsHeightSV = useSharedValue(0);
+  const [controlsHeight, setControlsHeight] = useState(0);
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offsetY = Math.max(event.nativeEvent.contentOffset.y, 0);
-      const shouldEnableControls = controlsHeight === 0 || offsetY < controlsHeight;
+      const height = controlsHeightSV.value;
+      const shouldEnableControls = height === 0 || offsetY < height;
 
-      scrollY.setValue(offsetY);
+      scrollY.value = offsetY;
       setAreControlsTouchable(current =>
         current === shouldEnableControls ? current : shouldEnableControls,
       );
     },
-    [controlsHeight, scrollY],
+    [scrollY, controlsHeightSV],
   );
 
   const handleControlsLayout = useCallback((event: LayoutChangeEvent) => {
     const nextHeight = event.nativeEvent.layout.height;
-
+    controlsHeightSV.value = nextHeight;
     setControlsHeight(current =>
       nextHeight !== current ? nextHeight : current,
     );
-  }, []);
+  }, [controlsHeightSV]);
 
-  const controlsAnimatedStyle = useMemo(
-    () =>
-      controlsHeight > 0
-        ? {
-            opacity: scrollY.interpolate({
-              inputRange: [0, controlsHeight * 0.85, controlsHeight],
-              outputRange: [1, 0.2, 0],
-              extrapolate: 'clamp',
-            }),
-            transform: [
-              {
-                translateY: scrollY.interpolate({
-                  inputRange: [0, controlsHeight],
-                  outputRange: [0, -controlsHeight],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ],
-          }
-        : undefined,
-    [controlsHeight, scrollY],
-  );
+  const controlsAnimatedStyle = useAnimatedStyle(() => {
+    const height = controlsHeightSV.value;
+    if (height === 0) {
+      return {};
+    }
+    return {
+      opacity: interpolate(
+        scrollY.value,
+        [0, height * 0.85, height],
+        [1, 0.2, 0],
+        Extrapolation.CLAMP,
+      ),
+      transform: [
+        {
+          translateY: interpolate(
+            scrollY.value,
+            [0, height],
+            [0, -height],
+            Extrapolation.CLAMP,
+          ),
+        },
+      ],
+    };
+  });
 
   const controlsPointerEvents: ViewProps['pointerEvents'] = areControlsTouchable
     ? 'auto'

@@ -2,12 +2,12 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-  Animated,
   FlatList,
   ListRenderItem,
   Text,
   View,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CharacterCard } from '../../components/CharacterCard';
 import { FilterBar } from '../../components/FilterBar';

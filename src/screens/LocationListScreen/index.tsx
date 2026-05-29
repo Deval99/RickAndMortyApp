@@ -2,13 +2,11 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo } from 'react';
 import {
-  Animated as RNAnimated,
   FlatList,
   Image,
   ListRenderItem,
   Pressable,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -20,7 +18,7 @@ import { useInfiniteLocations } from '../../hooks/useInfiniteLocations';
 import { usePressAnimation } from '../../hooks/usePressAnimation';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { FullLocation } from '../../types/location';
-import { ACCENT, styles } from './styles';
+import { styles } from './styles';
 
 type TabProps = BottomTabScreenProps<TabParamList, 'LocationList'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
@@ -103,7 +101,7 @@ export function LocationListScreen({ navigation }: Props) {
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
       <View style={styles.content}>
-        <RNAnimated.View
+        <Animated.View
           onLayout={handleControlsLayout}
           pointerEvents={controlsPointerEvents}
           style={[styles.controls, controlsAnimatedStyle]}
@@ -114,7 +112,7 @@ export function LocationListScreen({ navigation }: Props) {
               <Text style={styles.subtitle}>{totalCount} locations across the multiverse</Text>
             )}
           </View>
-        </RNAnimated.View>
+        </Animated.View>
 
         <FlatList
           data={locations}
