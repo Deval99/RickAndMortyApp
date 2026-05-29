@@ -9,13 +9,33 @@ import {
 import { useDebounce } from '../hooks/useDebounce';
 import images from '../assets/images';
 
+/**
+ * Props for the {@link SearchBar} component.
+ */
 interface Props {
+  /** The current (controlled) search string. */
   value: string;
+  /**
+   * Called with the debounced value after the user stops typing.
+   * Use this to trigger API calls or Redux dispatches.
+   */
   onChangeDebounced: (text: string) => void;
+  /** Debounce delay in milliseconds. Defaults to `300`. */
   debounceMs?: number;
+  /** Placeholder text shown when the input is empty. */
   placeholder?: string;
 }
 
+/**
+ * Debounced search input with a clear button.
+ *
+ * Maintains its own local state so keystrokes feel instant, then fires
+ * `onChangeDebounced` after the configured delay. When the parent resets
+ * `value` to an empty string (e.g. on filter clear), the local state is
+ * synchronised via a `useEffect`.
+ *
+ * @param props - {@link Props}
+ */
 export function SearchBar({
   value,
   onChangeDebounced,

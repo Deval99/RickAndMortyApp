@@ -25,6 +25,17 @@ type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 
+/**
+ * Location list screen (Locations tab).
+ *
+ * Infinite-scroll list of Rick and Morty universe locations. Each card shows
+ * the location name, type, dimension, and resident count. Tapping a card
+ * navigates to {@link LocationDetailScreen}.
+ *
+ * The header collapses on scroll via {@link useCollapsibleControls}.
+ *
+ * @param props - Navigation props injected by the bottom tab + root stack navigators.
+ */
 export function LocationListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
   const {
@@ -137,11 +148,23 @@ export function LocationListScreen({ navigation }: Props) {
 
 // ─── LocationCard ─────────────────────────────────────────────────────────────
 
+/**
+ * Props for the {@link LocationCard} sub-component.
+ */
 interface LocationCardProps {
+  /** The location data to display. */
   location: FullLocation;
+  /** Called when the card is tapped. */
   onPress: () => void;
 }
 
+/**
+ * Tappable card that summarises a single location.
+ *
+ * Shows a location icon, the location name, type, dimension, and a residents
+ * count badge. Includes a subtle scale press animation via
+ * {@link usePressAnimation}.
+ */
 function LocationCard({ location, onPress }: LocationCardProps) {
   const { animatedStyle, handlePressIn, handlePressOut } = usePressAnimation({
     scaleValue: 1.02,

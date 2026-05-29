@@ -11,10 +11,17 @@ import type { Character } from '../types/character';
 type Status = Character['status'] | '';
 type Gender = Character['gender'] | '';
 
+/**
+ * Props for the {@link FilterBar} component.
+ */
 interface Props {
+  /** Currently selected status filter value. Empty string means "All". */
   selectedStatus: Status;
+  /** Currently selected gender filter value. Empty string means "All". */
   selectedGender: Gender;
+  /** Called when the user taps a status chip. */
   onStatusChange: (status: Status) => void;
+  /** Called when the user taps a gender chip. */
   onGenderChange: (gender: Gender) => void;
 }
 
@@ -35,6 +42,14 @@ const GENDER_OPTIONS: { label: string; value: Gender }[] = [
 
 const ACCENT = '#00b5cc';
 
+/**
+ * Two-row horizontal chip bar for filtering characters by status and gender.
+ *
+ * Each row is a horizontally scrollable `FlatList` of tappable chips.
+ * The active chip is highlighted with the app's accent colour.
+ *
+ * @param props - {@link Props}
+ */
 export function FilterBar({
   selectedStatus,
   selectedGender,

@@ -12,11 +12,29 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH =
   (SCREEN_WIDTH - GRID_HORIZONTAL_PADDING * 2 - COLUMN_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
 
+/**
+ * Props for the {@link CharacterAvatar} component.
+ */
 interface CharacterAvatarProps {
+  /** The character whose avatar and name are displayed. */
   character: Character;
+  /** Called when the user taps the avatar card. */
   onPress: () => void;
 }
 
+/**
+ * Compact avatar card used in 3-column grids (episode / location detail screens).
+ *
+ * Displays the character's photo with a loading placeholder and an error
+ * fallback, plus the character's name below the image. Includes a subtle
+ * scale press animation via {@link usePressAnimation}.
+ *
+ * Grid layout constants (`ITEM_WIDTH`) are derived from the screen width,
+ * horizontal padding, and column gap so the card always fills exactly one
+ * third of the available width.
+ *
+ * @param props - {@link CharacterAvatarProps}
+ */
 export function CharacterAvatar({ character, onPress }: CharacterAvatarProps) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);

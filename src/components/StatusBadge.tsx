@@ -2,16 +2,35 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { Character } from '../types/character';
 
+/**
+ * Props for the {@link StatusBadge} component.
+ */
 interface Props {
+  /** The character's alive/dead/unknown status. */
   status: Character['status'];
 }
 
+/**
+ * Colour map from status value to its brand colour.
+ * - Alive → green
+ * - Dead  → red
+ * - unknown → grey
+ */
 const STATUS_COLORS: Record<Character['status'], string> = {
   Alive: '#55CC44',
   Dead: '#D63D2E',
   unknown: '#9E9E9E',
 };
 
+/**
+ * Pill-shaped badge that shows a character's life status with a coloured dot
+ * and label.
+ *
+ * The background and border are tinted with a 13 % opacity version of the
+ * status colour so the badge remains legible on any background.
+ *
+ * @param props - {@link Props}
+ */
 export function StatusBadge({ status }: Props) {
   const color = STATUS_COLORS[status];
   return (

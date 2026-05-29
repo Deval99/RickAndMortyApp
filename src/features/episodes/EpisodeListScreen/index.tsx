@@ -24,6 +24,17 @@ type TabProps = BottomTabScreenProps<TabParamList, 'EpisodesPaginated'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
+/**
+ * Episode list screen (Episodes tab).
+ *
+ * Fetches all episodes across every page and groups them by season into a
+ * sticky-header `SectionList`. A loading banner is shown at the top while
+ * additional pages are still being fetched in the background.
+ *
+ * Handles initial loading, error, and success states.
+ *
+ * @param props - Navigation props injected by the bottom tab + root stack navigators.
+ */
 export function EpisodeListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
   const {
@@ -128,6 +139,9 @@ export function EpisodeListScreen({ navigation }: Props) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
+/**
+ * Static header that displays the "Episodes" screen title.
+ */
 function ScreenHeader() {
   return (
     <View style={styles.header}>
@@ -136,11 +150,22 @@ function ScreenHeader() {
   );
 }
 
+/**
+ * Props for the {@link EpisodeRow} sub-component.
+ */
 interface EpisodeRowProps {
+  /** The episode data to display. */
   episode: Episode;
+  /** Called when the row is tapped. */
   onPress: () => void;
 }
 
+/**
+ * A single tappable row in the episode section list.
+ *
+ * Shows the episode code badge (e.g. `S01E03`), the episode name, and its
+ * air date, with a chevron on the right.
+ */
 function EpisodeRow({ episode, onPress }: EpisodeRowProps) {
   return (
     <TouchableOpacity

@@ -32,17 +32,42 @@ type TabProps = BottomTabScreenProps<TabParamList, 'CharacterList'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
-// FilterBar uses display-cased values from Character; map them to lowercase API params
+/**
+ * Converts a display-cased status value (e.g. `"Alive"`) to the lowercase
+ * string expected by the Rick and Morty API filter params.
+ *
+ * @param s - Display status from the Redux UI slice.
+ * @returns Lowercase API status string, or `undefined` when the value is empty.
+ */
 function toApiStatus(s: DisplayStatus): CharacterFilters['status'] | undefined {
   if (!s) return undefined;
   return s.toLowerCase() as CharacterFilters['status'];
 }
 
+/**
+ * Converts a display-cased gender value (e.g. `"Male"`) to the lowercase
+ * string expected by the Rick and Morty API filter params.
+ *
+ * @param g - Display gender from the Redux UI slice.
+ * @returns Lowercase API gender string, or `undefined` when the value is empty.
+ */
 function toApiGender(g: DisplayGender): CharacterFilters['gender'] | undefined {
   if (!g) return undefined;
   return g.toLowerCase() as CharacterFilters['gender'];
 }
 
+/**
+ * Main character list screen (Characters tab).
+ *
+ * Features:
+ * - Infinite-scroll `FlatList` powered by {@link useInfiniteCharacters}.
+ * - Redux-backed search, status, and gender filters persisted across tab
+ *   switches.
+ * - Collapsible header (search bar + filter chips) that hides on scroll.
+ * - Loading, error, and empty states with appropriate UI feedback.
+ *
+ * @param props - Navigation props injected by the bottom tab + root stack navigators.
+ */
 export function CharacterListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
   const dispatch = useAppDispatch();

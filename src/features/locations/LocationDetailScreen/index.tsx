@@ -22,6 +22,16 @@ type Props = NativeStackScreenProps<RootStackParamList, 'LocationDetail'>;
 
 const ACCENT = '#00b5cc';
 
+/**
+ * Location detail screen.
+ *
+ * Displays a meta card with the location name, type, and dimension, followed
+ * by a 3-column grid of {@link CharacterAvatar} cards for every resident.
+ *
+ * Handles loading, error, and success states independently.
+ *
+ * @param props - Navigation props injected by the root stack navigator.
+ */
 export function LocationDetailScreen({ route, navigation }: Props) {
   const { locationId } = route.params;
   const { location, residents, isLoading, isError, error, refetch } =
@@ -136,11 +146,21 @@ export function LocationDetailScreen({ route, navigation }: Props) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
+/**
+ * Props for the internal {@link Header} sub-component.
+ */
 interface HeaderProps {
+  /** Screen title shown in the centre of the header. */
   title: string;
+  /** Callback fired when the back button is pressed. */
   onBack: () => void;
 }
 
+/**
+ * Navigation header for the location detail screen.
+ *
+ * Contains a back button on the left and the location name centred in the bar.
+ */
 function Header({ title, onBack }: HeaderProps) {
   return (
     <View style={styles.header}>
@@ -161,6 +181,12 @@ function Header({ title, onBack }: HeaderProps) {
   );
 }
 
+/**
+ * A single label/value row inside the location meta card.
+ *
+ * @param label - Left-aligned descriptor text (e.g. `"Type"`).
+ * @param value - Right-aligned value text (e.g. `"Planet"`).
+ */
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.infoRow}>

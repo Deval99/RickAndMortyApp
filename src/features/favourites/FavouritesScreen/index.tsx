@@ -23,6 +23,18 @@ type TabProps = BottomTabScreenProps<TabParamList, 'Favourites'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
+/**
+ * Favourites screen (Favourites tab).
+ *
+ * Displays the list of characters the user has saved locally via SQLite.
+ * The list reloads every time the tab comes into focus so removals made on
+ * the character detail screen are reflected immediately.
+ *
+ * Shows a loading skeleton while the database query runs and an illustrated
+ * empty state when no favourites have been saved yet.
+ *
+ * @param props - Navigation props injected by the bottom tab + root stack navigators.
+ */
 export function FavouritesScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
   const { characters, isLoading, reload } = useFavourites();
@@ -86,6 +98,9 @@ export function FavouritesScreen({ navigation }: Props) {
   );
 }
 
+/**
+ * Static header that displays the "Favourites" screen title.
+ */
 function Header() {
   return (
     <View style={styles.header}>
@@ -94,6 +109,11 @@ function Header() {
   );
 }
 
+/**
+ * Illustrated empty state shown when the user has not saved any favourites yet.
+ *
+ * Displays a heart icon, a title, and a short instructional subtitle.
+ */
 function EmptyState() {
   return (
     <View style={styles.centered}>

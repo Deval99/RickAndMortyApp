@@ -28,12 +28,29 @@ const avatarTransition = SharedTransition.createInstance()
   .damping(20)
   .stiffness(200);
 
-// Extract episode number from URL like https://rickandmortyapi.com/api/episode/28
+/**
+ * Extracts the episode number from a Rick and Morty API episode URL and
+ * returns a short label like `"EP 28"`.
+ *
+ * @param url - Full episode URL, e.g. `https://rickandmortyapi.com/api/episode/28`.
+ * @returns Short label string, or the original URL if no match is found.
+ */
 function episodeLabel(url: string): string {
   const match = url.match(/\/episode\/(\d+)$/);
   return match ? `EP ${match[1]}` : url;
 }
 
+/**
+ * Character detail screen.
+ *
+ * Displays a large avatar (with a shared-element spring transition from the
+ * list), character metadata cards (info, origin, last known location), a
+ * horizontal episode chip list, and a favourite toggle button in the header.
+ *
+ * Handles loading, error, and success states independently.
+ *
+ * @param props - Navigation props injected by the root stack navigator.
+ */
 export function CharacterDetailScreen({ route, navigation }: Props) {
   const { characterId } = route.params;
   const { data: character, isLoading, isError, error, refetch } = useCharacter(characterId);
@@ -176,13 +193,26 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
+/**
+ * Props for the internal {@link Header} sub-component.
+ */
 interface HeaderProps {
+  /** Callback fired when the back button is pressed. */
   onBack: () => void;
+  /** Screen title shown in the centre of the header. */
   title: string;
+  /** Whether the character is currently saved as a favourite. */
   isFavourite: boolean;
+  /** Callback fired when the favourite toggle button is pressed. */
   onToggle: () => void;
 }
 
+/**
+ * Navigation header for the character detail screen.
+ *
+ * Contains a back button on the left, the character name in the centre, and a
+ * heart icon toggle on the right that reflects and controls the favourite state.
+ */
 function Header({ onBack, title, isFavourite, onToggle }: HeaderProps) {
   return (
     <View style={styles.header}>
@@ -218,10 +248,21 @@ function Header({ onBack, title, isFavourite, onToggle }: HeaderProps) {
   );
 }
 
+/**
+ * Uppercase section title label used inside info cards.
+ *
+ * @param title - The label text to display.
+ */
 function SectionTitle({ title }: { title: string }) {
   return <Text style={styles.sectionTitle}>{title}</Text>;
 }
 
+/**
+ * A single label/value row inside an info card.
+ *
+ * @param label - Left-aligned descriptor text (e.g. `"Species"`).
+ * @param value - Right-aligned value text (e.g. `"Human"`).
+ */
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.infoRow}>

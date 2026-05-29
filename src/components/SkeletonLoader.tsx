@@ -11,13 +11,26 @@ import Animated, {
 
 // ─── Primitive shimmer block ──────────────────────────────────────────────────
 
+/**
+ * Props for the internal {@link Shimmer} primitive.
+ */
 interface ShimmerProps {
+  /** Width of the shimmer block. Accepts a pixel number or a percentage string. */
   width: number | `${number}%`;
+  /** Height of the shimmer block in pixels. */
   height: number;
+  /** Border radius of the shimmer block. Defaults to `6`. */
   borderRadius?: number;
+  /** Additional style overrides applied to the animated view. */
   style?: object;
 }
 
+/**
+ * Animated grey rectangle that pulses between 40 % and 100 % opacity to
+ * simulate a content-loading shimmer effect.
+ *
+ * This is an internal primitive — use the exported skeleton components instead.
+ */
 function Shimmer({ width, height, borderRadius = 6, style }: ShimmerProps) {
   const opacity = useSharedValue(0.4);
 
@@ -55,6 +68,12 @@ function Shimmer({ width, height, borderRadius = 6, style }: ShimmerProps) {
 
 // ─── Character card skeleton ──────────────────────────────────────────────────
 
+/**
+ * Single skeleton placeholder that mirrors the layout of {@link CharacterCard}.
+ *
+ * Shows a wide avatar shimmer on the left and several text-line shimmers on
+ * the right while the real data is loading.
+ */
 export function CharacterCardSkeleton() {
   return (
     <View style={styles.card}>
@@ -71,7 +90,11 @@ export function CharacterCardSkeleton() {
   );
 }
 
-/** Renders N character card skeletons */
+/**
+ * Renders `count` {@link CharacterCardSkeleton} placeholders stacked vertically.
+ *
+ * @param count - Number of skeleton cards to render. Defaults to `6`.
+ */
 export function CharacterListSkeleton({ count = 6 }: { count?: number }) {
   return (
     <>
@@ -84,6 +107,12 @@ export function CharacterListSkeleton({ count = 6 }: { count?: number }) {
 
 // ─── Episode row skeleton ─────────────────────────────────────────────────────
 
+/**
+ * Single skeleton placeholder that mirrors the layout of an episode list row.
+ *
+ * Shows an episode-code badge shimmer on the left and two text-line shimmers
+ * on the right.
+ */
 export function EpisodeRowSkeleton() {
   return (
     <View style={styles.episodeRow}>
@@ -96,6 +125,11 @@ export function EpisodeRowSkeleton() {
   );
 }
 
+/**
+ * Renders `count` {@link EpisodeRowSkeleton} placeholders stacked vertically.
+ *
+ * @param count - Number of skeleton rows to render. Defaults to `8`.
+ */
 export function EpisodeListSkeleton({ count = 8 }: { count?: number }) {
   return (
     <>
@@ -108,9 +142,23 @@ export function EpisodeListSkeleton({ count = 8 }: { count?: number }) {
 
 // ─── Location card skeleton ───────────────────────────────────────────────────
 
-export function LocationCardSkeleton({ containerStyle }: {
-  containerStyle?: ViewStyle
-}) {
+/**
+ * Props for {@link LocationCardSkeleton}.
+ */
+interface LocationCardSkeletonProps {
+  /** Optional style overrides for the outer card container. */
+  containerStyle?: ViewStyle;
+}
+
+/**
+ * Single skeleton placeholder that mirrors the layout of a location list card.
+ *
+ * Shows a circular icon shimmer, three text-line shimmers, and a residents
+ * badge shimmer.
+ *
+ * @param props - {@link LocationCardSkeletonProps}
+ */
+export function LocationCardSkeleton({ containerStyle }: LocationCardSkeletonProps) {
   return (
     <View style={[styles.locationCard, containerStyle]}>
       <View style={styles.locationTop}>
@@ -128,6 +176,11 @@ export function LocationCardSkeleton({ containerStyle }: {
   );
 }
 
+/**
+ * Renders `count` {@link LocationCardSkeleton} placeholders stacked vertically.
+ *
+ * @param count - Number of skeleton cards to render. Defaults to `6`.
+ */
 export function LocationListSkeleton({ count = 6 }: { count?: number }) {
   return (
     <>
@@ -140,6 +193,15 @@ export function LocationListSkeleton({ count = 6 }: { count?: number }) {
 
 // ─── Avatar grid skeleton (used in detail screens) ───────────────────────────
 
+/**
+ * Grid of avatar-card skeleton placeholders used on episode and location
+ * detail screens while the resident / cast list is loading.
+ *
+ * Renders `count` items in a wrapping flex row that matches the 3-column
+ * `FlatList` layout used by {@link CharacterAvatar}.
+ *
+ * @param count - Number of avatar placeholders to render. Defaults to `9`.
+ */
 export function AvatarGridSkeleton({ count = 9 }: { count?: number }) {
   return (
     <View style={styles.grid}>

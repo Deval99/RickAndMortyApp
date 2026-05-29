@@ -20,6 +20,17 @@ import { navigateToDetail } from '../../../utils/navigateToDetail';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EpisodeDetail'>;
 
+/**
+ * Episode detail screen.
+ *
+ * Displays a meta card with the episode code, name, and air date, followed by
+ * a 3-column grid of {@link CharacterAvatar} cards for every character that
+ * appears in the episode.
+ *
+ * Handles loading, error, and success states independently.
+ *
+ * @param props - Navigation props injected by the root stack navigator.
+ */
 export function EpisodeDetailScreen({ route, navigation }: Props) {
   const { episodeId } = route.params;
   const { episode, characters, isLoading, isError, error, refetch } =
@@ -107,11 +118,21 @@ export function EpisodeDetailScreen({ route, navigation }: Props) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
+/**
+ * Props for the internal {@link Header} sub-component.
+ */
 interface HeaderProps {
+  /** Screen title shown in the centre of the header. */
   title: string;
+  /** Callback fired when the back button is pressed. */
   onBack: () => void;
 }
 
+/**
+ * Navigation header for the episode detail screen.
+ *
+ * Contains a back button on the left and the episode name centred in the bar.
+ */
 function Header({ title, onBack }: HeaderProps) {
   return (
     <View style={styles.header}>

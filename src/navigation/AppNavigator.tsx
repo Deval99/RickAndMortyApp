@@ -16,15 +16,25 @@ import { useAppDispatch } from '../store/hooks';
 
 // ─── Param lists ─────────────────────────────────────────────────────────────
 
-/** Root stack — shared across all tabs */
+/**
+ * Root stack navigator param list.
+ *
+ * Shared across all tabs — detail screens are pushed on top of the tab bar.
+ */
 export type RootStackParamList = {
+  /** Bottom tab navigator host screen. No params. */
   Tabs: undefined;
+  /** Character detail screen. */
   CharacterDetail: { characterId: number };
+  /** Episode detail screen. */
   EpisodeDetail: { episodeId: number };
+  /** Location detail screen. */
   LocationDetail: { locationId: number };
 };
 
-/** Bottom tab param list */
+/**
+ * Bottom tab navigator param list.
+ */
 export type TabParamList = {
   CharacterList: undefined;
   EpisodesPaginated: undefined;
@@ -37,6 +47,10 @@ export type TabParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
+/**
+ * Maps each tab label to its icon asset so `TabIcon` can look up the correct
+ * image without a long if/else chain.
+ */
 const TAB_ICONS: Record<string, ReturnType<typeof require>> = {
   Characters: images.icCharacter,
   Episodes: images.icEpisodes,
@@ -44,6 +58,12 @@ const TAB_ICONS: Record<string, ReturnType<typeof require>> = {
   Favourites: images.icFavouriteFilled,
 };
 
+/**
+ * Renders the icon for a bottom tab.
+ *
+ * @param label   - Human-readable tab label used to look up the icon asset.
+ * @param focused - Whether the tab is currently active; controls opacity.
+ */
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
   const source = TAB_ICONS[label] ?? images.icCharacter;
   return (
@@ -55,6 +75,12 @@ function TabIcon({ label, focused }: { label: string; focused: boolean }) {
   );
 }
 
+/**
+ * Bottom tab navigator that hosts the four main screens.
+ *
+ * Dispatches a Redux action on every tab press so the active tab name is
+ * available in the global store (e.g. for analytics or conditional logic).
+ */
 function TabNavigator() {
   const dispatch = useAppDispatch();
 
@@ -120,6 +146,15 @@ function TabNavigator() {
   );
 }
 
+/**
+ * Root navigator for the entire application.
+ *
+ * Wraps everything in a `NavigationContainer` and sets up a native stack with
+ * the tab navigator at the root plus three modal-style detail screens
+ * (CharacterDetail, EpisodeDetail, LocationDetail).
+ *
+ * Render this component once at the app entry point.
+ */
 export function AppNavigator() {
   return (
     <NavigationContainer>

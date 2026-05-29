@@ -15,16 +15,34 @@ import { StatusBadge } from './StatusBadge';
 import type { Character } from '../types/character';
 import { usePressAnimation } from '../hooks/usePressAnimation';
 
+/**
+ * Props for the {@link CharacterCard} component.
+ */
 interface Props {
+  /** The character data to display. */
   character: Character;
+  /** Navigation prop used to push the detail screen. Optional — card is non-interactive without it. */
   navigation?: NativeStackNavigationProp<RootStackParamList>;
 }
 
+/**
+ * Shared-element spring transition applied to the character avatar image
+ * so it animates smoothly into the detail screen.
+ */
 const avatarTransition = SharedTransition.createInstance()
   .springify()
   .damping(20)
   .stiffness(200);
 
+/**
+ * Horizontal list card that displays a character's avatar, name, status badge,
+ * species, and last-known location.
+ *
+ * Tapping the card navigates to {@link CharacterDetailScreen} using a shared
+ * element transition on the avatar image.
+ *
+ * @param props - {@link Props}
+ */
 export function CharacterCard({ character, navigation }: Props) {
   const { animatedStyle, handlePressIn, handlePressOut } = usePressAnimation();
 
