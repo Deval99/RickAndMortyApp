@@ -2,6 +2,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import {
+  Animated,
   Image,
   SectionList,
   SectionListRenderItem,
@@ -13,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../assets/images';
 import { EpisodeListSkeleton } from '../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
 import type { TabParamList } from '../../navigation/AppNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import type { Episode } from '../../types/episode';
@@ -24,6 +26,13 @@ type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 export function EpisodeListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
+  const {
+    controlsAnimatedStyle,
+    controlsHeight,
+    controlsPointerEvents,
+    handleControlsLayout,
+    handleScroll,
+  } = useCollapsibleControls();
   const { seasons, isLoading, isError, error, refetch, isLoadingAll, totalLoaded } =
     useAllEpisodes();
 
@@ -82,26 +91,37 @@ export function EpisodeListScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
-      <ScreenHeader />
+      <View style={styles.content}>
+        <Animated.View
+          onLayout={handleControlsLayout}
+          pointerEvents={controlsPointerEvents}
+          style={[styles.controls, controlsAnimatedStyle]}
+        >
+          <ScreenHeader />
 
-      {/* Loading banner while fetching remaining pages */}
-      {isLoadingAll && seasons.length > 0 && (
-        <View style={styles.loadingBanner}>
-          <Text style={styles.loadingBannerText}>
-            Loading… {totalLoaded} episodes so far
-          </Text>
-        </View>
-      )}
+          {/* Loading banner while fetching remaining pages */}
+          {isLoadingAll && seasons.length > 0 && (
+            <View style={styles.loadingBanner}>
+              <Text style={styles.loadingBannerText}>
+                Loading… {totalLoaded} episodes so far
+              </Text>
+            </View>
+          )}
 
-      <SectionList
-        sections={seasons}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        stickySectionHeadersEnabled
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-      />
+        </Animated.View>
+
+        <SectionList
+          sections={seasons}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          stickySectionHeadersEnabled
+          showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={[styles.listContent, { paddingTop: controlsHeight }]}
+        />
+      </View>
     </View>
   );
 }
@@ -151,6 +171,17 @@ const ACCENT = '#00b5cc';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
+  },
+  content: {
+    flex: 1,
+  },
+  controls: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
     backgroundColor: '#f7f8fa',
   },
   centered: {

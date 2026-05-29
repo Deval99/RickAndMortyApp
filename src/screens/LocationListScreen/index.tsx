@@ -2,6 +2,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo } from 'react';
 import {
+  Animated,
   FlatList,
   Image,
   ListRenderItem,
@@ -12,6 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../assets/images';
 import { LocationCardSkeleton, LocationListSkeleton } from '../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
 import { useInfiniteLocations } from '../../hooks/useInfiniteLocations';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { FullLocation } from '../../types/location';
@@ -24,6 +26,13 @@ type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 export function LocationListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
+  const {
+    controlsAnimatedStyle,
+    controlsHeight,
+    controlsPointerEvents,
+    handleControlsLayout,
+    handleScroll,
+  } = useCollapsibleControls();
   const {
     data,
     fetchNextPage,
@@ -90,26 +99,37 @@ export function LocationListScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Locations</Text>
-        {totalCount > 0 && (
-          <Text style={styles.subtitle}>{totalCount} locations across the multiverse</Text>
-        )}
-      </View>
+      <View style={styles.content}>
+        <Animated.View
+          onLayout={handleControlsLayout}
+          pointerEvents={controlsPointerEvents}
+          style={[styles.controls, controlsAnimatedStyle]}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>Locations</Text>
+            {totalCount > 0 && (
+              <Text style={styles.subtitle}>{totalCount} locations across the multiverse</Text>
+            )}
+          </View>
+        </Animated.View>
 
-      <FlatList
-        data={locations}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        onEndReached={handleEndReached}
-        onEndReachedThreshold={0.15}
-        ListFooterComponent={ListFooter}
-        ListEmptyComponent={ListEmpty}
-        contentContainerStyle={
-          locations.length === 0 ? styles.emptyContainer : styles.listContent
-        }
-        showsVerticalScrollIndicator={false}
-      />
+        <FlatList
+          data={locations}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.15}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          ListFooterComponent={ListFooter}
+          ListEmptyComponent={ListEmpty}
+          contentContainerStyle={[
+            locations.length === 0 ? styles.emptyContainer : styles.listContent,
+            { paddingTop: controlsHeight },
+          ]}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
     </View>
   );
 }

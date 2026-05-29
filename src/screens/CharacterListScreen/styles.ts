@@ -5,6 +5,17 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f7f8fa',
   },
+  content: {
+    flex: 1,
+  },
+  controls: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    backgroundColor: '#f7f8fa',
+  },
   header: {
     paddingHorizontal: 16,
     paddingTop: 8,

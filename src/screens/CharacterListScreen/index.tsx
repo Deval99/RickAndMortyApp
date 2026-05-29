@@ -2,6 +2,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
+  Animated,
   FlatList,
   ListRenderItem,
   Text,
@@ -12,6 +13,7 @@ import { CharacterCard } from '../../components/CharacterCard';
 import { FilterBar } from '../../components/FilterBar';
 import { SearchBar } from '../../components/SearchBar';
 import { CharacterCardSkeleton, CharacterListSkeleton } from '../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
 import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { Character, CharacterFilters } from '../../types/character';
@@ -41,6 +43,13 @@ export function CharacterListScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<DisplayStatus>('');
   const [gender, setGender] = useState<DisplayGender>('');
+  const {
+    controlsAnimatedStyle,
+    controlsHeight,
+    controlsPointerEvents,
+    handleControlsLayout,
+    handleScroll,
+  } = useCollapsibleControls();
 
   const filters = useMemo<CharacterFilters>(
     () => ({
@@ -118,32 +127,43 @@ export function CharacterListScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Characters</Text>
+      <View style={styles.content}>
+        <Animated.View
+          onLayout={handleControlsLayout}
+          pointerEvents={controlsPointerEvents}
+          style={[styles.controls, controlsAnimatedStyle]}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>Characters</Text>
+          </View>
+
+          <SearchBar value={search} onChangeDebounced={setSearch} />
+          <FilterBar
+            selectedStatus={status}
+            selectedGender={gender}
+            onStatusChange={setStatus}
+            onGenderChange={setGender}
+          />
+        </Animated.View>
+
+        <FlatList
+          data={characters}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.1}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          decelerationRate={0.985}
+          ListFooterComponent={ListFooter}
+          ListEmptyComponent={ListEmpty}
+          contentContainerStyle={[
+            characters.length === 0 ? styles.emptyContainer : styles.listContent,
+            { paddingTop: controlsHeight },
+          ]}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
-
-      <SearchBar value={search} onChangeDebounced={setSearch} />
-      <FilterBar
-        selectedStatus={status}
-        selectedGender={gender}
-        onStatusChange={setStatus}
-        onGenderChange={setGender}
-      />
-
-      <FlatList
-        data={characters}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        onEndReached={handleEndReached}
-        onEndReachedThreshold={0.1}
-        decelerationRate={0.985}
-        ListFooterComponent={ListFooter}
-        ListEmptyComponent={ListEmpty}
-        contentContainerStyle={
-          characters.length === 0 ? styles.emptyContainer : styles.listContent
-        }
-        showsVerticalScrollIndicator={false}
-      />
     </View>
   );
 }

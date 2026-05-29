@@ -2,6 +2,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import {
+  Animated,
   FlatList,
   Image,
   ListRenderItem,
@@ -13,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../assets/images';
 import { CharacterCard } from '../../components/CharacterCard';
 import { CharacterListSkeleton } from '../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
 import { useFavourites } from '../../hooks/useFavourites';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { Character } from '../../types/character';
@@ -24,6 +26,13 @@ type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 export function FavouritesScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
   const { characters, isLoading, reload } = useFavourites();
+  const {
+    controlsAnimatedStyle,
+    controlsHeight,
+    controlsPointerEvents,
+    handleControlsLayout,
+    handleScroll,
+  } = useCollapsibleControls();
 
   // Reload whenever the tab comes into focus so removals on the detail screen
   // are reflected immediately.
@@ -50,17 +59,29 @@ export function FavouritesScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
-      <Header />
-      <FlatList
-        data={characters}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        contentContainerStyle={
-          characters.length === 0 ? styles.emptyContainer : styles.listContent
-        }
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<EmptyState />}
-      />
+      <View style={styles.content}>
+        <Animated.View
+          onLayout={handleControlsLayout}
+          pointerEvents={controlsPointerEvents}
+          style={[styles.controls, controlsAnimatedStyle]}
+        >
+          <Header />
+        </Animated.View>
+
+        <FlatList
+          data={characters}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={[
+            characters.length === 0 ? styles.emptyContainer : styles.listContent,
+            { paddingTop: controlsHeight },
+          ]}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<EmptyState />}
+        />
+      </View>
     </View>
   );
 }
@@ -89,6 +110,17 @@ function EmptyState() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#f7f8fa',
+  },
+  content: {
+    flex: 1,
+  },
+  controls: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
     backgroundColor: '#f7f8fa',
   },
   header: {
