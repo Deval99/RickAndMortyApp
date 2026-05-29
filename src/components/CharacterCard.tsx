@@ -8,15 +8,12 @@ import {
 } from 'react-native';
 import Animated, {
   SharedTransition,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { StatusBadge } from './StatusBadge';
 import type { Character } from '../types/character';
+import { usePressAnimation } from '../hooks/usePressAnimation';
 
 interface Props {
   character: Character;
@@ -29,24 +26,7 @@ const avatarTransition = SharedTransition.createInstance()
   .stiffness(200);
 
 export function CharacterCard({ character, navigation }: Props) {
-  const scale = useSharedValue(1);
-  const shadowOpacity = useSharedValue(0.1);
-
-  const animatedCardStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    shadowOpacity: shadowOpacity.value,
-    elevation: shadowOpacity.value > 0.1 ? 6 : 2,
-  }));
-
-  const handlePressIn = () => {
-    scale.value = withSpring(1.025, { damping: 15, stiffness: 100 });
-    shadowOpacity.value = withTiming(0.22, { duration: 120 });
-  };
-
-  const handlePressOut = () => {
-    scale.value = withSpring(1, { damping: 15, stiffness: 100 });
-    shadowOpacity.value = withTiming(0.1, { duration: 200 });
-  };
+  const { animatedStyle, handlePressIn, handlePressOut } = usePressAnimation();
 
   const handlePress = () => {
     navigation?.navigate('CharacterDetail', { characterId: character.id });
@@ -60,7 +40,7 @@ export function CharacterCard({ character, navigation }: Props) {
       accessibilityRole="button"
       accessibilityLabel={`${character.name}, ${character.status}`}
     >
-      <Animated.View style={[styles.card, animatedCardStyle]}>
+      <Animated.View style={[styles.card, animatedStyle]}>
         <Animated.Image
           source={{ uri: character.image }}
           style={styles.avatar}

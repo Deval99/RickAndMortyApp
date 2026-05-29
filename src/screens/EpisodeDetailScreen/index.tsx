@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import {
   FlatList,
   Image,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '../../assets/images';
+import { CharacterAvatar } from '../../components/CharacterAvatar';
 import { AvatarGridSkeleton } from '../../components/SkeletonLoader';
 import { useEpisodeWithCharacters } from '../../hooks/useEpisodeWithCharacters';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
@@ -131,53 +132,6 @@ function Header({ title, onBack }: HeaderProps) {
   );
 }
 
-interface CharacterAvatarProps {
-  character: Character;
-  onPress: () => void;
-}
-
-function CharacterAvatar({ character, onPress }: CharacterAvatarProps) {
-  const [loaded, setLoaded] = useState(false);
-  const [errored, setErrored] = useState(false);
-
-  const handleLoad = useCallback(() => setLoaded(true), []);
-  const handleError = useCallback(() => setErrored(true), []);
-
-  return (
-    <TouchableOpacity
-      style={styles.avatarCard}
-      onPress={onPress}
-      activeOpacity={0.8}
-      accessibilityRole="button"
-      accessibilityLabel={`${character.name}, ${character.status}`}
-    >
-      <View style={styles.avatarImageWrapper}>
-        {/* Placeholder shown until image loads */}
-        {!loaded && !errored && (
-          <View style={styles.avatarPlaceholder} />
-        )}
-        {errored ? (
-          <View style={[styles.avatarPlaceholder, styles.avatarError]}>
-            <Text style={styles.avatarErrorIcon}>?</Text>
-          </View>
-        ) : (
-          <Image
-            source={{ uri: character.image }}
-            style={[styles.avatarImage, !loaded && styles.avatarImageHidden]}
-            resizeMode="cover"
-            onLoad={handleLoad}
-            onError={handleError}
-            accessibilityLabel={`${character.name} avatar`}
-          />
-        )}
-      </View>
-      <Text style={styles.avatarName} numberOfLines={2}>
-        {character.name}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const ACCENT = '#00b5cc';
@@ -279,60 +233,6 @@ const styles = StyleSheet.create({
   columnWrapper: {
     gap: 8,
     marginBottom: 8,
-  },
-
-  // Avatar card
-  avatarCard: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 8,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    gap: 6,
-  },
-  avatarImageWrapper: {
-    width: '100%',
-    aspectRatio: 1,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#e8e8e8',
-  },
-  avatarImage: {
-    width: '100%',
-    height: '100%',
-  },
-  avatarImageHidden: {
-    opacity: 0,
-  },
-  avatarPlaceholder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#e8e8e8',
-  },
-  avatarError: {
-    backgroundColor: '#f5e6e6',
-  },
-  avatarErrorIcon: {
-    fontSize: 20,
-    color: '#D63D2E',
-    fontWeight: '700',
-  },
-  avatarName: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#1a1a2e',
-    textAlign: 'center',
-    lineHeight: 14,
   },
 
   // Error / retry
