@@ -9,22 +9,22 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CharacterCard } from '../../components/CharacterCard';
-import { FilterBar } from '../../components/FilterBar';
-import { SearchBar } from '../../components/SearchBar';
-import { CharacterCardSkeleton, CharacterListSkeleton } from '../../components/SkeletonLoader';
-import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
-import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
-import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
+import { CharacterCard } from '../../../components/CharacterCard';
+import { FilterBar } from '../../../components/FilterBar';
+import { SearchBar } from '../../../components/SearchBar';
+import { CharacterCardSkeleton, CharacterListSkeleton } from '../../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../../hooks/useCollapsibleControls';
+import { useInfiniteCharacters } from '../../../hooks/useInfiniteCharacters';
+import type { RootStackParamList, TabParamList } from '../../../navigation/AppNavigator';
 import {
   setGenderFilter,
   setSearchFilter,
   setStatusFilter,
   useAppDispatch,
   useAppSelector,
-} from '../../store';
-import type { DisplayGender, DisplayStatus } from '../../store/slices/uiSlice';
-import type { Character, CharacterFilters } from '../../types/character';
+} from '../../../store';
+import type { DisplayGender, DisplayStatus } from '../../../store/slices/uiSlice';
+import type { Character, CharacterFilters } from '../../../types/character';
 import { styles } from './styles';
 
 // Tab screen props combined with root stack navigation for cross-stack navigation

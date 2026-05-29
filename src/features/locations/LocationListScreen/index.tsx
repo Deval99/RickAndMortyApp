@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import images from '../../assets/images';
-import { LocationCardSkeleton, LocationListSkeleton } from '../../components/SkeletonLoader';
-import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
-import { useInfiniteLocations } from '../../hooks/useInfiniteLocations';
-import { usePressAnimation } from '../../hooks/usePressAnimation';
-import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
-import type { FullLocation } from '../../types/location';
+import images from '../../../assets/images';
+import { LocationCardSkeleton, LocationListSkeleton } from '../../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../../hooks/useCollapsibleControls';
+import { useInfiniteLocations } from '../../../hooks/useInfiniteLocations';
+import { usePressAnimation } from '../../../hooks/usePressAnimation';
+import type { RootStackParamList, TabParamList } from '../../../navigation/AppNavigator';
+import type { FullLocation } from '../../../types/location';
 import { styles } from './styles';
 
 type TabProps = BottomTabScreenProps<TabParamList, 'LocationList'>;

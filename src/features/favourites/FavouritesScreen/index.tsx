@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import images from '../../assets/images';
-import { CharacterCard } from '../../components/CharacterCard';
-import { CharacterListSkeleton } from '../../components/SkeletonLoader';
-import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
-import { useFavourites } from '../../hooks/useFavourites';
-import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
-import type { Character } from '../../types/character';
+import images from '../../../assets/images';
+import { CharacterCard } from '../../../components/CharacterCard';
+import { CharacterListSkeleton } from '../../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../../hooks/useCollapsibleControls';
+import { useFavourites } from '../../../hooks/useFavourites';
+import type { RootStackParamList, TabParamList } from '../../../navigation/AppNavigator';
+import type { Character } from '../../../types/character';
 
 type TabProps = BottomTabScreenProps<TabParamList, 'Favourites'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];

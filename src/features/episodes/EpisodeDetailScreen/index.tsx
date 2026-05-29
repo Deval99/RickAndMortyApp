@@ -10,13 +10,13 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import images from '../../assets/images';
-import { CharacterAvatar } from '../../components/CharacterAvatar';
-import { AvatarGridSkeleton } from '../../components/SkeletonLoader';
-import { useEpisodeWithCharacters } from '../../hooks/useEpisodeWithCharacters';
-import type { RootStackParamList } from '../../navigation/AppNavigator';
-import type { Character } from '../../types/character';
-import { navigateToDetail } from '../../utils/navigateToDetail';
+import images from '../../../assets/images';
+import { CharacterAvatar } from '../../../components/CharacterAvatar';
+import { AvatarGridSkeleton } from '../../../components/SkeletonLoader';
+import { useEpisodeWithCharacters } from '../../../hooks/useEpisodeWithCharacters';
+import type { RootStackParamList } from '../../../navigation/AppNavigator';
+import type { Character } from '../../../types/character';
+import { navigateToDetail } from '../../../utils/navigateToDetail';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EpisodeDetail'>;
 

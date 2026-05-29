@@ -12,13 +12,13 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import images from '../../assets/images';
-import { EpisodeListSkeleton } from '../../components/SkeletonLoader';
-import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
-import type { TabParamList } from '../../navigation/AppNavigator';
-import type { RootStackParamList } from '../../navigation/AppNavigator';
-import type { Episode } from '../../types/episode';
-import { useAllEpisodes, type EpisodeSeason } from '../../hooks/useAllEpisodes';
+import images from '../../../assets/images';
+import { EpisodeListSkeleton } from '../../../components/SkeletonLoader';
+import { useCollapsibleControls } from '../../../hooks/useCollapsibleControls';
+import type { TabParamList } from '../../../navigation/AppNavigator';
+import type { RootStackParamList } from '../../../navigation/AppNavigator';
+import type { Episode } from '../../../types/episode';
+import { useAllEpisodes, type EpisodeSeason } from '../../../hooks/useAllEpisodes';
 
 type TabProps = BottomTabScreenProps<TabParamList, 'EpisodesPaginated'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];

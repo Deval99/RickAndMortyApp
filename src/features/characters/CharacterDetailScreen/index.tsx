@@ -13,13 +13,13 @@ import Animated, {
   SharedTransition,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import images from '../../assets/images';
-import { StatusBadge } from '../../components/StatusBadge';
-import { AvatarGridSkeleton } from '../../components/SkeletonLoader';
-import { useCharacter } from '../../hooks/useCharacter';
-import { useFavourite } from '../../hooks/useFavourite';
-import type { RootStackParamList } from '../../navigation/AppNavigator';
-import { navigateToDetail } from '../../utils/navigateToDetail';
+import images from '../../../assets/images';
+import { StatusBadge } from '../../../components/StatusBadge';
+import { AvatarGridSkeleton } from '../../../components/SkeletonLoader';
+import { useCharacter } from '../../../hooks/useCharacter';
+import { useFavourite } from '../../../hooks/useFavourite';
+import type { RootStackParamList } from '../../../navigation/AppNavigator';
+import { navigateToDetail } from '../../../utils/navigateToDetail';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CharacterDetail'>;
 
