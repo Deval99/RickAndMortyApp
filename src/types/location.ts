@@ -8,6 +8,3 @@ export interface FullLocation {
   url: string;
   created: string;
 }
-
-/** @deprecated Use FullLocation instead */
-export type RMLocation = FullLocation;

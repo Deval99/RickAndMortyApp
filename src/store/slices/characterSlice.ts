@@ -36,11 +36,6 @@ const characterSlice = createSlice({
         state.favourites.splice(index, 1);
       }
     },
-    logout(state) {
-      state.selectedCharacter = null;
-      state.status = 'idle';
-      state.error = null;
-    },
   },
   extraReducers: builder => {
     builder
@@ -59,5 +54,5 @@ const characterSlice = createSlice({
   },
 });
 
-export const { toggleFavourite, logout } = characterSlice.actions;
+export const { toggleFavourite } = characterSlice.actions;
 export default characterSlice.reducer;

@@ -9,6 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Animated, {
+  SharedTransition,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '../../assets/images';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -19,6 +22,11 @@ import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { navigateToDetail } from '../../utils/navigateToDetail';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CharacterDetail'>;
+
+const avatarTransition = SharedTransition.createInstance()
+  .springify()
+  .damping(20)
+  .stiffness(200);
 
 // Extract episode number from URL like https://rickandmortyapi.com/api/episode/28
 function episodeLabel(url: string): string {
@@ -94,11 +102,13 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
         contentContainerStyle={styles.scrollContent}
       >
         {/* ── Large Avatar ── */}
-        <Image
+        <Animated.Image
           source={{ uri: character.image }}
           style={styles.avatar}
           resizeMode="cover"
           accessibilityLabel={`${character.name} avatar`}
+          sharedTransitionTag={`character-avatar-${character.id}`}
+          sharedTransitionStyle={avatarTransition}
         />
 
         {/* ── Name + Status ── */}

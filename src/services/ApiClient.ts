@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import { store } from '../store';
-import { logout } from '../store/slices/characterSlice';
 import type { ApiError } from '../types/api';
 
 // Extend Axios config to carry a request start timestamp
@@ -86,9 +85,6 @@ apiClient.interceptors.response.use(
         statusCode,
         originalError: axiosError,
       };
-      if (statusCode === 401) {
-        store.dispatch(logout());
-      }
       return Promise.reject(apiError);
     }
 

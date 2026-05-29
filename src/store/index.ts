@@ -14,4 +14,4 @@ export type AppDispatch = typeof store.dispatch;
 export { useAppDispatch, useAppSelector } from './hooks';
 
 // Re-export slice actions
-export { toggleFavourite, fetchCharacterById, logout } from './slices/characterSlice';
+export { toggleFavourite, fetchCharacterById } from './slices/characterSlice';

@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../assets/images';
-import { LocationListSkeleton } from '../../components/SkeletonLoader';
+import { LocationCardSkeleton, LocationListSkeleton } from '../../components/SkeletonLoader';
 import { useInfiniteLocations } from '../../hooks/useInfiniteLocations';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
-import type { RMLocation } from '../../types/location';
+import type { FullLocation } from '../../types/location';
 import { ACCENT, styles } from './styles';
 
 type TabProps = BottomTabScreenProps<TabParamList, 'LocationList'>;
@@ -48,7 +48,7 @@ export function LocationListScreen({ navigation }: Props) {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const renderItem: ListRenderItem<RMLocation> = useCallback(
+  const renderItem: ListRenderItem<FullLocation> = useCallback(
     ({ item }) => (
       <LocationCard
         location={item}
@@ -58,12 +58,12 @@ export function LocationListScreen({ navigation }: Props) {
     [navigation],
   );
 
-  const keyExtractor = useCallback((item: RMLocation) => String(item.id), []);
+  const keyExtractor = useCallback((item: FullLocation) => String(item.id), []);
 
   const ListFooter = useCallback(() => {
-    if (!isFetchingNextPage) return null;
-    return <View style={styles.footer} />;
-  }, [isFetchingNextPage]);
+    if (!hasNextPage) return null;
+    return <LocationCardSkeleton containerStyle={{ marginHorizontal: 0 }} />;
+  }, [hasNextPage]);
 
   const ListEmpty = useCallback(() => {
     if (isLoading) {
@@ -117,7 +117,7 @@ export function LocationListScreen({ navigation }: Props) {
 // ─── LocationCard ─────────────────────────────────────────────────────────────
 
 interface LocationCardProps {
-  location: RMLocation;
+  location: FullLocation;
   onPress: () => void;
 }
 

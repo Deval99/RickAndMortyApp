@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View, ViewStyle } from 'react-native';
 
 // ─── Primitive shimmer block ──────────────────────────────────────────────────
 
@@ -103,9 +103,11 @@ export function EpisodeListSkeleton({ count = 8 }: { count?: number }) {
 
 // ─── Location card skeleton ───────────────────────────────────────────────────
 
-export function LocationCardSkeleton() {
+export function LocationCardSkeleton({ containerStyle }: {
+  containerStyle?: ViewStyle
+}) {
   return (
-    <View style={styles.locationCard}>
+    <View style={[styles.locationCard, containerStyle]}>
       <View style={styles.locationTop}>
         <Shimmer width={44} height={44} borderRadius={22} />
         <View style={styles.locationInfo}>

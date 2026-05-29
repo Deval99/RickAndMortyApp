@@ -22,5 +22,9 @@ export function useInfiniteCharacters(
       CharacterService.getCharacters(pageParam as number, filters),
     initialPageParam: 1,
     getNextPageParam,
+    retry: (failureCount, error) => {
+      if (error?.statusCode === 404) return false;
+      return failureCount < 2;
+    },
   });
 }

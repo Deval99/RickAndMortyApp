@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CharacterCard } from '../../components/CharacterCard';
 import { FilterBar } from '../../components/FilterBar';
 import { SearchBar } from '../../components/SearchBar';
-import { CharacterListSkeleton } from '../../components/SkeletonLoader';
+import { CharacterCardSkeleton, CharacterListSkeleton } from '../../components/SkeletonLoader';
 import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
 import type { Character, CharacterFilters } from '../../types/character';
@@ -81,8 +81,8 @@ export function CharacterListScreen({ navigation }: Props) {
   const keyExtractor = useCallback((item: Character) => String(item.id), []);
 
   const ListFooter = () => {
-    if (!isFetchingNextPage) return null;
-    return <View style={styles.footer} />;
+    if (!hasNextPage) return null;
+    return <CharacterCardSkeleton />;
   };
 
   const ListEmpty = () => {
@@ -90,6 +90,14 @@ export function CharacterListScreen({ navigation }: Props) {
       return <CharacterListSkeleton count={6} />;
     }
     if (isError) {
+      const is404 = (error as { statusCode?: number })?.statusCode === 404;
+      if (is404) {
+        return (
+          <View style={styles.centered}>
+            <Text style={styles.emptyText}>No data found</Text>
+          </View>
+        );
+      }
       return (
         <View style={styles.centered}>
           <Text style={styles.errorText}>
