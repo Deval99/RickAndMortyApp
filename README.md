@@ -1,97 +1,149 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Rick and Morty App
 
-# Getting Started
+A React Native app for browsing the [Rick and Morty API](https://rickandmortyapi.com/api). Browse characters, episodes, and locations — and save your favourites for offline access.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## Features
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- **Characters** — infinite-scroll list with debounced search and status/gender filters
+- **Episodes** — all episodes fetched and grouped by season with sticky section headers
+- **Locations** — infinite-scroll list of all locations in the show
+- **Favourites** — offline-capable list of saved characters, persisted to SQLite
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+Each list item navigates to a detail screen with full info and related data (e.g. characters in an episode, residents of a location).
 
-```sh
-# Using npm
-npm start
+---
 
-# OR using Yarn
-yarn start
+## Tech Stack
+
+| Category | Library | Version |
+|---|---|---|
+| Framework | React Native | 0.85.3 |
+| Language | TypeScript | ^5.8.3 |
+| Navigation | React Navigation (native-stack + bottom-tabs) | ^7.x |
+| Server state | TanStack React Query | ^5.100.14 |
+| Client state | Redux Toolkit + react-redux | ^2.12 / ^9.3 |
+| HTTP | Axios | ^1.16.1 |
+| Local DB | react-native-quick-sqlite | ^8.2.7 |
+| Animations | react-native-reanimated + react-native-worklets | ^4.4 / ^0.9 |
+
+---
+
+## Project Structure
+
+```
+src/
+├── assets/images/        # App icons and images
+├── components/           # Shared UI components
+│   ├── CharacterCard.tsx
+│   ├── FilterBar.tsx     # Status + gender filter dropdowns
+│   ├── SearchBar.tsx     # Debounced search input
+│   ├── SkeletonLoader.tsx
+│   └── StatusBadge.tsx
+├── database/
+│   └── DatabaseService.ts  # SQLite (characters cache + favourites)
+├── hooks/                # React Query + custom hooks
+│   ├── useInfiniteCharacters.ts
+│   ├── useInfiniteLocations.ts
+│   ├── useAllEpisodes.ts
+│   ├── useFavourite.ts
+│   ├── useFavourites.ts
+│   └── ...
+├── navigation/
+│   └── AppNavigator.tsx  # Root stack + bottom tab navigator
+├── screens/
+│   ├── CharacterListScreen/
+│   ├── CharacterDetailScreen/
+│   ├── EpisodeListScreen/
+│   ├── EpisodeDetailScreen/
+│   ├── LocationListScreen/
+│   ├── LocationDetailScreen/
+│   └── FavouritesScreen/
+├── services/
+│   ├── ApiClient.ts      # Axios instance with interceptors + 429 handling
+│   ├── CharacterService.ts
+│   ├── EpisodeService.ts
+│   └── LocationService.ts
+├── store/
+│   ├── index.ts
+│   ├── hooks.ts
+│   └── slices/characterSlice.ts
+└── types/
+    ├── api.ts
+    ├── character.ts
+    ├── episode.ts
+    └── location.ts
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Architecture
 
-### Android
+**State management — dual layer:**
+- TanStack React Query handles all remote data (caching, pagination, retries, loading/error states)
+- Redux Toolkit holds UI state: the favourites ID list and selected character
 
-```sh
-# Using npm
+**Offline favourites:**
+- Toggling a favourite writes to two SQLite tables: `favourites` (ID only) and `characters` (full data)
+- The Favourites screen reads entirely from SQLite and works without an internet connection
+
+**API client:**
+- Axios with request/response interceptors for logging and request timing
+- Built-in 429 rate-limit handling — blocks all requests for 5 seconds after a rate-limit response
+
+**Navigation:**
+- Single root `NativeStack` with a `BottomTab` navigator as the entry point
+- Detail screens live on the root stack so they can be pushed from any tab
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 22.11.0
+- React Native development environment set up ([guide](https://reactnative.dev/docs/set-up-your-environment))
+- Android Studio (for Android) or Xcode (for iOS)
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run on Android
+
+```bash
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+### Run on iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+```bash
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Start Metro bundler
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```bash
+npm start
+```
 
-## Step 3: Modify your app
+---
 
-Now that you have successfully run the app, let's make changes!
+## Scripts
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+| Command | Description |
+|---|---|
+| `npm start` | Start Metro bundler (with cache reset) |
+| `npm run android` | Build and run on Android |
+| `npm run ios` | Build and run on iOS |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run Jest tests |
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+---
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## API
 
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Data is sourced from the public [Rick and Morty API](https://rickandmortyapi.com). No API key required.

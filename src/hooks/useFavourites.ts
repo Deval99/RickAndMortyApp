@@ -1,28 +1,27 @@
-import { useCallback, useEffect, useState } from 'react';
-import { DatabaseService } from '../database/DatabaseService';
-import type { Character } from '../types/character';
+import { useCallback, useEffect } from 'react';
+import { loadFavourites } from '../store';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 
 /**
- * Loads all favourited characters from SQLite.
- * No API calls — works fully offline.
+ * Provides the list of favourited characters from the Redux store.
+ * Triggers a SQLite load on mount (and on manual `reload()`).
+ * Works fully offline — no API calls.
  */
 export function useFavourites() {
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const results = await DatabaseService.getFavouriteCharacters();
-      setCharacters(results);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const characters = useAppSelector(state => state.favourites.characters);
+  const isLoading = useAppSelector(
+    state => state.favourites.status === 'loading',
+  );
+
+  const reload = useCallback(() => {
+    dispatch(loadFavourites());
+  }, [dispatch]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    reload();
+  }, [reload]);
 
-  return { characters, isLoading, reload: load };
+  return { characters, isLoading, reload };
 }
