@@ -1,85 +1,15 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withSequence,
-  withTiming,
-  cancelAnimation,
-} from 'react-native-reanimated';
+import React from 'react';
+import { View, ViewStyle } from 'react-native';
+import { Shimmer } from './Shimmer';
+import styles from './skeletonStyles';
 
-// ─── Primitive shimmer block ──────────────────────────────────────────────────
+// Character card skeleton
 
-/**
- * Props for the internal {@link Shimmer} primitive.
- */
-interface ShimmerProps {
-  /** Width of the shimmer block. Accepts a pixel number or a percentage string. */
-  width: number | `${number}%`;
-  /** Height of the shimmer block in pixels. */
-  height: number;
-  /** Border radius of the shimmer block. Defaults to `6`. */
-  borderRadius?: number;
-  /** Additional style overrides applied to the animated view. */
-  style?: object;
-}
-
-/**
- * Animated grey rectangle that pulses between 40 % and 100 % opacity to
- * simulate a content-loading shimmer effect.
- *
- * This is an internal primitive — use the exported skeleton components instead.
- */
-function Shimmer({ width, height, borderRadius = 6, style }: ShimmerProps) {
-  const opacity = useSharedValue(0.4);
-
-  useEffect(() => {
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 700 }),
-        withTiming(0.4, { duration: 700 }),
-      ),
-      -1,
-      false,
-    );
-    return () => cancelAnimation(opacity);
-  }, [opacity]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.View
-      style={[
-        {
-          width,
-          height,
-          borderRadius,
-          backgroundColor: '#e0e0e0',
-        },
-        animatedStyle,
-        style,
-      ]}
-    />
-  );
-}
-
-// ─── Character card skeleton ──────────────────────────────────────────────────
-
-/**
- * Single skeleton placeholder that mirrors the layout of {@link CharacterCard}.
- *
- * Shows a wide avatar shimmer on the left and several text-line shimmers on
- * the right while the real data is loading.
- */
+/** Single skeleton placeholder that mirrors the layout of {@link CharacterCard}. */
 export function CharacterCardSkeleton() {
   return (
     <View style={styles.card}>
-      {/* Avatar placeholder */}
       <Shimmer width={100} height={102} borderRadius={0} />
-      {/* Text lines */}
       <View style={styles.info}>
         <Shimmer width="70%" height={16} />
         <Shimmer width={80} height={22} borderRadius={12} />
@@ -92,8 +22,7 @@ export function CharacterCardSkeleton() {
 
 /**
  * Renders `count` {@link CharacterCardSkeleton} placeholders stacked vertically.
- *
- * @param count - Number of skeleton cards to render. Defaults to `6`.
+ * @param count - Defaults to `6`.
  */
 export function CharacterListSkeleton({ count = 6 }: { count?: number }) {
   return (
@@ -105,14 +34,9 @@ export function CharacterListSkeleton({ count = 6 }: { count?: number }) {
   );
 }
 
-// ─── Episode row skeleton ─────────────────────────────────────────────────────
+// Episode row skeleton
 
-/**
- * Single skeleton placeholder that mirrors the layout of an episode list row.
- *
- * Shows an episode-code badge shimmer on the left and two text-line shimmers
- * on the right.
- */
+/** Single skeleton placeholder that mirrors the layout of an episode list row. */
 export function EpisodeRowSkeleton() {
   return (
     <View style={styles.episodeRow}>
@@ -127,8 +51,7 @@ export function EpisodeRowSkeleton() {
 
 /**
  * Renders `count` {@link EpisodeRowSkeleton} placeholders stacked vertically.
- *
- * @param count - Number of skeleton rows to render. Defaults to `8`.
+ * @param count - Defaults to `8`.
  */
 export function EpisodeListSkeleton({ count = 8 }: { count?: number }) {
   return (
@@ -140,24 +63,14 @@ export function EpisodeListSkeleton({ count = 8 }: { count?: number }) {
   );
 }
 
-// ─── Location card skeleton ───────────────────────────────────────────────────
+// Location card skeleton
 
-/**
- * Props for {@link LocationCardSkeleton}.
- */
 interface LocationCardSkeletonProps {
   /** Optional style overrides for the outer card container. */
   containerStyle?: ViewStyle;
 }
 
-/**
- * Single skeleton placeholder that mirrors the layout of a location list card.
- *
- * Shows a circular icon shimmer, three text-line shimmers, and a residents
- * badge shimmer.
- *
- * @param props - {@link LocationCardSkeletonProps}
- */
+/** Single skeleton placeholder that mirrors the layout of a location list card. */
 export function LocationCardSkeleton({ containerStyle }: LocationCardSkeletonProps) {
   return (
     <View style={[styles.locationCard, containerStyle]}>
@@ -178,8 +91,7 @@ export function LocationCardSkeleton({ containerStyle }: LocationCardSkeletonPro
 
 /**
  * Renders `count` {@link LocationCardSkeleton} placeholders stacked vertically.
- *
- * @param count - Number of skeleton cards to render. Defaults to `6`.
+ * @param count - Defaults to `6`.
  */
 export function LocationListSkeleton({ count = 6 }: { count?: number }) {
   return (
@@ -191,16 +103,12 @@ export function LocationListSkeleton({ count = 6 }: { count?: number }) {
   );
 }
 
-// ─── Avatar grid skeleton (used in detail screens) ───────────────────────────
+// Avatar grid skeleton (used in detail screens)
 
 /**
  * Grid of avatar-card skeleton placeholders used on episode and location
  * detail screens while the resident / cast list is loading.
- *
- * Renders `count` items in a wrapping flex row that matches the 3-column
- * `FlatList` layout used by {@link CharacterAvatar}.
- *
- * @param count - Number of avatar placeholders to render. Defaults to `9`.
+ * @param count - Defaults to `9`.
  */
 export function AvatarGridSkeleton({ count = 9 }: { count?: number }) {
   return (
@@ -214,93 +122,3 @@ export function AvatarGridSkeleton({ count = 9 }: { count?: number }) {
     </View>
   );
 }
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  // Character card
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  info: {
-    flex: 1,
-    padding: 10,
-    gap: 6,
-    justifyContent: 'center',
-  },
-
-  // Episode row
-  episodeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#f0f0f0',
-    gap: 12,
-  },
-  episodeInfo: {
-    flex: 1,
-    gap: 6,
-  },
-
-  // Location card
-  locationCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    padding: 14,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    gap: 10,
-  },
-  locationTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  locationInfo: {
-    flex: 1,
-    gap: 6,
-  },
-  locationBottom: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-  },
-
-  // Avatar grid
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 12,
-    gap: 8,
-    justifyContent: 'center',
-  },
-  avatarCard: {
-    width: '30%',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 8,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-  },
-});

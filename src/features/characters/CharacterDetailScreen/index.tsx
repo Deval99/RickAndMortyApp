@@ -1,24 +1,20 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
-import {
-  FlatList,
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Animated, {
-  SharedTransition,
-} from 'react-native-reanimated';
+import { FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { SharedTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import images from '../../../assets/images';
 import { StatusBadge } from '../../../components/StatusBadge';
-import { AvatarGridSkeleton } from '../../../components/SkeletonLoader';
 import { useCharacter } from '../../../hooks/useCharacter';
 import { useFavourite } from '../../../hooks/useFavourite';
 import type { RootStackParamList } from '../../../navigation/AppNavigator';
 import { navigateToDetail } from '../../../utils/navigateToDetail';
+import {
+  ErrorView,
+  Header,
+  InfoRow,
+  LoadingView,
+  SectionTitle,
+} from './CharacterDetailComponents';
 import styles from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CharacterDetail'>;
@@ -31,9 +27,6 @@ const avatarTransition = SharedTransition.createInstance()
 /**
  * Extracts the episode number from a Rick and Morty API episode URL and
  * returns a short label like `"EP 28"`.
- *
- * @param url - Full episode URL, e.g. `https://rickandmortyapi.com/api/episode/28`.
- * @returns Short label string, or the original URL if no match is found.
  */
 function episodeLabel(url: string): string {
   const match = url.match(/\/episode\/(\d+)$/);
@@ -44,40 +37,24 @@ function episodeLabel(url: string): string {
  * Character detail screen.
  *
  * Displays a large avatar (with a shared-element spring transition from the
- * list), character metadata cards (info, origin, last known location), a
- * horizontal episode chip list, and a favourite toggle button in the header.
- *
- * Handles loading, error, and success states independently.
- *
- * @param props - Navigation props injected by the root stack navigator.
+ * list), character metadata cards, a horizontal episode chip list, and a
+ * favourite toggle button in the header.
  */
 export function CharacterDetailScreen({ route, navigation }: Props) {
   const { characterId } = route.params;
   const { data: character, isLoading, isError, error, refetch } = useCharacter(characterId);
   const { isFavourite, toggle } = useFavourite(characterId, character);
 
+  const emptyHeader = (
+    <Header onBack={() => navigation.goBack()} title="" isFavourite={false} onToggle={() => {}} />
+  );
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <Header onBack={() => navigation.goBack()} title="" isFavourite={false} onToggle={() => {}} />
+        {emptyHeader}
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Avatar skeleton */}
-          <View style={[styles.avatar, { backgroundColor: '#e0e0e0' }]} />
-          {/* Name + status skeleton */}
-          <View style={[styles.nameRow, { gap: 8 }]}>
-            <View style={{ width: '60%', height: 26, borderRadius: 6, backgroundColor: '#e0e0e0' }} />
-            <View style={{ width: 80, height: 22, borderRadius: 12, backgroundColor: '#e0e0e0' }} />
-          </View>
-          {/* Info card skeletons */}
-          <AvatarGridSkeleton count={0} />
-          {[1, 2, 3].map(i => (
-            <View key={i} style={[styles.card, { gap: 10 }]}>
-              <View style={{ width: '40%', height: 13, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
-              {[1, 2, 3].map(j => (
-                <View key={j} style={{ width: '100%', height: 14, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
-              ))}
-            </View>
-          ))}
+          <LoadingView />
         </ScrollView>
       </SafeAreaView>
     );
@@ -86,15 +63,8 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
   if (isError || !character) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <Header onBack={() => navigation.goBack()} title="" isFavourite={false} onToggle={() => {}} />
-        <View style={styles.centered}>
-          <Text style={styles.errorText}>
-            {(error as { message?: string })?.message ?? 'Failed to load character'}
-          </Text>
-          <TouchableOpacity onPress={() => refetch()} accessibilityRole="button">
-            <Text style={styles.retryText}>Tap to retry</Text>
-          </TouchableOpacity>
-        </View>
+        {emptyHeader}
+        <ErrorView error={error} onRetry={refetch} />
       </SafeAreaView>
     );
   }
@@ -190,87 +160,3 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-/**
- * Props for the internal {@link Header} sub-component.
- */
-interface HeaderProps {
-  /** Callback fired when the back button is pressed. */
-  onBack: () => void;
-  /** Screen title shown in the centre of the header. */
-  title: string;
-  /** Whether the character is currently saved as a favourite. */
-  isFavourite: boolean;
-  /** Callback fired when the favourite toggle button is pressed. */
-  onToggle: () => void;
-}
-
-/**
- * Navigation header for the character detail screen.
- *
- * Contains a back button on the left, the character name in the centre, and a
- * heart icon toggle on the right that reflects and controls the favourite state.
- */
-function Header({ onBack, title, isFavourite, onToggle }: HeaderProps) {
-  return (
-    <View style={styles.header}>
-      <TouchableOpacity
-        onPress={onBack}
-        style={styles.backBtn}
-        accessibilityRole="button"
-        accessibilityLabel="Go back"
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <Image source={images.icLeftArrow} style={styles.backIcon} resizeMode="contain" />
-      </TouchableOpacity>
-
-      <Text style={styles.headerTitle} numberOfLines={1}>
-        {title}
-      </Text>
-
-      <TouchableOpacity
-        onPress={onToggle}
-        style={styles.favBtn}
-        accessibilityRole="button"
-        accessibilityLabel={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
-        accessibilityState={{ checked: isFavourite }}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <Image
-          source={isFavourite ? images.icFavouriteFilled : images.icFavourite}
-          style={[styles.favIcon, isFavourite && styles.favIconActive]}
-          resizeMode="contain"
-        />
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-/**
- * Uppercase section title label used inside info cards.
- *
- * @param title - The label text to display.
- */
-function SectionTitle({ title }: { title: string }) {
-  return <Text style={styles.sectionTitle}>{title}</Text>;
-}
-
-/**
- * A single label/value row inside an info card.
- *
- * @param label - Left-aligned descriptor text (e.g. `"Species"`).
- * @param value - Right-aligned value text (e.g. `"Human"`).
- */
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  );
-}
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-
