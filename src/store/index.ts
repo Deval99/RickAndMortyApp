@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import characterReducer from './slices/characterSlice';
 import favouritesReducer from './slices/favouritesSlice';
+import uiReducer from './slices/uiSlice';
 
 export const store = configureStore({
   reducer: {
     characters: characterReducer,
     favourites: favouritesReducer,
+    ui: uiReducer,
   },
 });
 
@@ -20,3 +22,12 @@ export { toggleFavourite, fetchCharacterById } from './slices/characterSlice';
 
 // Re-export favourites slice thunks
 export { loadFavourites, addFavourite, removeFavourite } from './slices/favouritesSlice';
+
+// Re-export ui slice actions
+export {
+  setActiveTab,
+  setSearchFilter,
+  setStatusFilter,
+  setGenderFilter,
+  resetCharacterFilters,
+} from './slices/uiSlice';

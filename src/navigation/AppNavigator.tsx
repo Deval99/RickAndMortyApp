@@ -11,6 +11,8 @@ import { EpisodeListScreen } from '../screens/EpisodeListScreen';
 import { FavouritesScreen } from '../screens/FavouritesScreen';
 import { LocationDetailScreen } from '../screens/LocationDetailScreen';
 import { LocationListScreen } from '../screens/LocationListScreen';
+import { setActiveTab } from '../store';
+import { useAppDispatch } from '../store/hooks';
 
 // ─── Param lists ─────────────────────────────────────────────────────────────
 
@@ -54,8 +56,19 @@ function TabIcon({ label, focused }: { label: string; focused: boolean }) {
 }
 
 function TabNavigator() {
+  const dispatch = useAppDispatch();
+
   return (
     <Tab.Navigator
+      screenListeners={{
+        tabPress: e => {
+          // e.target is "ScreenName-<key>"; extract the screen name before the dash
+          const tabName = (e.target ?? '').split('-')[0] as keyof TabParamList;
+          if (tabName) {
+            dispatch(setActiveTab(tabName));
+          }
+        },
+      }}
       screenOptions={({ route }: { route: { name: keyof TabParamList } }) => ({
         headerShown: false,
         tabBarActiveTintColor: '#00b5cc',

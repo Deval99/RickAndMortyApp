@@ -1,6 +1,6 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   FlatList,
   ListRenderItem,
@@ -16,6 +16,14 @@ import { CharacterCardSkeleton, CharacterListSkeleton } from '../../components/S
 import { useCollapsibleControls } from '../../hooks/useCollapsibleControls';
 import { useInfiniteCharacters } from '../../hooks/useInfiniteCharacters';
 import type { RootStackParamList, TabParamList } from '../../navigation/AppNavigator';
+import {
+  setGenderFilter,
+  setSearchFilter,
+  setStatusFilter,
+  useAppDispatch,
+  useAppSelector,
+} from '../../store';
+import type { DisplayGender, DisplayStatus } from '../../store/slices/uiSlice';
 import type { Character, CharacterFilters } from '../../types/character';
 import { styles } from './styles';
 
@@ -25,9 +33,6 @@ type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 
 // FilterBar uses display-cased values from Character; map them to lowercase API params
-type DisplayStatus = Character['status'] | '';
-type DisplayGender = Character['gender'] | '';
-
 function toApiStatus(s: DisplayStatus): CharacterFilters['status'] | undefined {
   if (!s) return undefined;
   return s.toLowerCase() as CharacterFilters['status'];
@@ -40,9 +45,25 @@ function toApiGender(g: DisplayGender): CharacterFilters['gender'] | undefined {
 
 export function CharacterListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<DisplayStatus>('');
-  const [gender, setGender] = useState<DisplayGender>('');
+  const dispatch = useAppDispatch();
+
+  // ── Filters from Redux (global UI state) ──────────────────────────────────
+  const search = useAppSelector(state => state.ui.characterFilters.search);
+  const status = useAppSelector(state => state.ui.characterFilters.status);
+  const gender = useAppSelector(state => state.ui.characterFilters.gender);
+
+  const handleSearchChange = useCallback(
+    (value: string) => dispatch(setSearchFilter(value)),
+    [dispatch],
+  );
+  const handleStatusChange = useCallback(
+    (value: DisplayStatus) => dispatch(setStatusFilter(value)),
+    [dispatch],
+  );
+  const handleGenderChange = useCallback(
+    (value: DisplayGender) => dispatch(setGenderFilter(value)),
+    [dispatch],
+  );
   const {
     controlsAnimatedStyle,
     controlsHeight,
@@ -137,12 +158,12 @@ export function CharacterListScreen({ navigation }: Props) {
             <Text style={styles.title}>Characters</Text>
           </View>
 
-          <SearchBar value={search} onChangeDebounced={setSearch} />
+          <SearchBar value={search} onChangeDebounced={handleSearchChange} />
           <FilterBar
             selectedStatus={status}
             selectedGender={gender}
-            onStatusChange={setStatus}
-            onGenderChange={setGender}
+            onStatusChange={handleStatusChange}
+            onGenderChange={handleGenderChange}
           />
         </Animated.View>
 
