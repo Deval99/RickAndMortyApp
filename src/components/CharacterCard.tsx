@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   avatar: {
-    width: 100,
-    height: 100,
+    width: 110,
+    height: '100%',
   },
   info: {
     flex: 1,

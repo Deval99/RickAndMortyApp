@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 12,
     gap: 8,
+    justifyContent: 'center'
   },
   avatarCard: {
     width: '30%',
