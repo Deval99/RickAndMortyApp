@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { EpisodeService } from '../services/EpisodeService';
 import type { Episode } from '../types/episode';
 import type { ApiError, PaginatedResponse } from '../types/api';
@@ -33,12 +33,11 @@ export function useAllEpisodes() {
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = query;
 
   // Trigger fetching remaining pages automatically
-  useMemo(() => {
+  useEffect(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasNextPage, isFetchingNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   /** All episodes flattened and grouped by season */
   const seasons: EpisodeSeason[] = useMemo(() => {

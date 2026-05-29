@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
-import { store } from '../store';
 import type { ApiError } from '../types/api';
 
 // Extend Axios config to carry a request start timestamp
@@ -32,12 +31,6 @@ apiClient.interceptors.request.use((config: TimedAxiosRequestConfig) => {
 
   // Stamp the start time so we can compute duration on response
   config._startTime = Date.now();
-
-  const state = store.getState();
-  const token = (state as Record<string, unknown> & { auth?: { token?: string } }).auth?.token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
 
   console.log(
     `[API] ▶ ${(config.method ?? 'GET').toUpperCase()} ${config.baseURL ?? ''}${config.url ?? ''}`,

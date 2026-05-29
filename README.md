@@ -1,115 +1,40 @@
 # Rick and Morty App
 
-A React Native app for browsing the [Rick and Morty API](https://rickandmortyapi.com/api). Browse characters, episodes, and locations — and save your favourites for offline access.
+A React Native app for browsing the [Rick and Morty API](https://rickandmortyapi.com/). Browse characters, episodes, and locations, and save your favourites for offline access.
 
 ---
 
 ## Features
 
-- **Characters** — infinite-scroll list with debounced search and status/gender filters
-- **Episodes** — all episodes fetched and grouped by season with sticky section headers
-- **Locations** — infinite-scroll list of all locations in the show
-- **Favourites** — offline-capable list of saved characters, persisted to SQLite
-
-Each list item navigates to a detail screen with full info and related data (e.g. characters in an episode, residents of a location).
+- **Characters** — infinite-scroll list with search, status, and gender filters; detail screen with species, origin, location, and episode chips
+- **Episodes** — full episode list grouped by season, with detail screen showing cast
+- **Locations** — paginated location list with detail screen showing residents
+- **Favourites** — persisted offline via SQLite; available without a network connection
 
 ---
 
-## Tech Stack
-
-| Category | Library | Version |
-|---|---|---|
-| Framework | React Native | 0.85.3 |
-| Language | TypeScript | ^5.8.3 |
-| Navigation | React Navigation (native-stack + bottom-tabs) | ^7.x |
-| Server state | TanStack React Query | ^5.100.14 |
-| Client state | Redux Toolkit + react-redux | ^2.12 / ^9.3 |
-| HTTP | Axios | ^1.16.1 |
-| Local DB | react-native-quick-sqlite | ^8.2.7 |
-| Animations | react-native-reanimated + react-native-worklets | ^4.4 / ^0.9 |
-
----
-
-## Project Structure
-
-```
-src/
-├── assets/images/        # App icons and images
-├── components/           # Shared UI components
-│   ├── CharacterCard.tsx
-│   ├── FilterBar.tsx     # Status + gender filter dropdowns
-│   ├── SearchBar.tsx     # Debounced search input
-│   ├── SkeletonLoader.tsx
-│   └── StatusBadge.tsx
-├── database/
-│   └── DatabaseService.ts  # SQLite (characters cache + favourites)
-├── hooks/                # React Query + custom hooks
-│   ├── useInfiniteCharacters.ts
-│   ├── useInfiniteLocations.ts
-│   ├── useAllEpisodes.ts
-│   ├── useFavourite.ts
-│   ├── useFavourites.ts
-│   └── ...
-├── navigation/
-│   └── AppNavigator.tsx  # Root stack + bottom tab navigator
-├── screens/
-│   ├── CharacterListScreen/
-│   ├── CharacterDetailScreen/
-│   ├── EpisodeListScreen/
-│   ├── EpisodeDetailScreen/
-│   ├── LocationListScreen/
-│   ├── LocationDetailScreen/
-│   └── FavouritesScreen/
-├── services/
-│   ├── ApiClient.ts      # Axios instance with interceptors + 429 handling
-│   ├── CharacterService.ts
-│   ├── EpisodeService.ts
-│   └── LocationService.ts
-├── store/
-│   ├── index.ts
-│   ├── hooks.ts
-│   └── slices/characterSlice.ts
-└── types/
-    ├── api.ts
-    ├── character.ts
-    ├── episode.ts
-    └── location.ts
-```
-
----
-
-## Architecture
-
-**State management — dual layer:**
-- TanStack React Query handles all remote data (caching, pagination, retries, loading/error states)
-- Redux Toolkit holds UI state: the favourites ID list and selected character
-
-**Offline favourites:**
-- Toggling a favourite writes to two SQLite tables: `favourites` (ID only) and `characters` (full data)
-- The Favourites screen reads entirely from SQLite and works without an internet connection
-
-**API client:**
-- Axios with request/response interceptors for logging and request timing
-- Built-in 429 rate-limit handling — blocks all requests for 5 seconds after a rate-limit response
-
-**Navigation:**
-- Single root `NativeStack` with a `BottomTab` navigator as the entry point
-- Detail screens live on the root stack so they can be pushed from any tab
-
----
-
-## Getting Started
+## Project Setup
 
 ### Prerequisites
 
-- Node.js >= 22.11.0
-- React Native development environment set up ([guide](https://reactnative.dev/docs/set-up-your-environment))
-- Android Studio (for Android) or Xcode (for iOS)
+| Tool | Version |
+|---|---|
+| Node.js | >= 22.11.0 |
+| React Native CLI | via `@react-native-community/cli` |
+| Android Studio / Xcode | Latest stable |
+| JDK | 17+ (Android) |
+| CocoaPods | Latest (iOS) |
 
 ### Install dependencies
 
 ```bash
 npm install
+```
+
+### iOS — install pods
+
+```bash
+cd ios && pod install && cd ..
 ```
 
 ### Run on Android
@@ -124,26 +49,72 @@ npm run android
 npm run ios
 ```
 
-### Start Metro bundler
+### Start Metro bundler (with cache reset)
 
 ```bash
 npm start
 ```
 
+### Lint
+
+```bash
+npm run lint
+```
+
+### Tests
+
+```bash
+npm test
+```
+
 ---
 
-## Scripts
+## Libraries
 
-| Command | Description |
-|---|---|
-| `npm start` | Start Metro bundler (with cache reset) |
-| `npm run android` | Build and run on Android |
-| `npm run ios` | Build and run on iOS |
-| `npm run lint` | Run ESLint |
-| `npm test` | Run Jest tests |
+| Library | Version | Purpose |
+|---|---|---|
+| `react-native` | 0.85.3 | Core framework |
+| `@react-navigation/native` | ^7.2.5 | Navigation container |
+| `@react-navigation/native-stack` | ^7.16.0 | Stack navigator |
+| `@react-navigation/bottom-tabs` | ^7.16.2 | Bottom tab navigator |
+| `@reduxjs/toolkit` | ^2.12.0 | Global state management |
+| `react-redux` | ^9.3.0 | React bindings for Redux |
+| `@tanstack/react-query` | ^5.100.14 | Server state, infinite queries, caching |
+| `axios` | ^1.16.1 | HTTP client with interceptors |
+| `react-native-quick-sqlite` | ^8.2.7 | SQLite offline storage for favourites |
+| `react-native-reanimated` | ^4.4.0 | Animations (shared transitions, collapsible header, press effects) |
+| `react-native-worklets` | ^0.9.1 | Worklets runtime required by Reanimated 4 |
+| `react-native-screens` | ^4.25.2 | Native screen optimisation |
+| `react-native-safe-area-context` | ^5.5.2 | Safe area insets |
 
 ---
 
-## API
+## Architecture
 
-Data is sourced from the public [Rick and Morty API](https://rickandmortyapi.com). No API key required.
+```
+src/
+├── assets/images/        # PNG icon assets
+├── components/           # Shared UI components (CharacterCard, FilterBar, SearchBar, SkeletonLoader, StatusBadge)
+├── database/             # SQLite service (react-native-quick-sqlite)
+├── features/             # Feature-based screens
+│   ├── characters/       # CharacterListScreen, CharacterDetailScreen
+│   ├── episodes/         # EpisodeListScreen, EpisodeDetailScreen
+│   ├── favourites/       # FavouritesScreen
+│   └── locations/        # LocationListScreen, LocationDetailScreen
+├── hooks/                # Custom hooks (data fetching, animations, favourites)
+├── navigation/           # AppNavigator (root stack + bottom tabs)
+├── services/             # ApiClient (Axios), CharacterService, EpisodeService, LocationService
+├── store/                # Redux store + slices (characters, favourites, ui)
+├── types/                # TypeScript interfaces (Character, Episode, Location, API types)
+└── utils/                # navigateToDetail (prevents stack bloat)
+```
+
+**State management split:**
+- React Query handles all server/async state (fetching, caching, pagination)
+- Redux manages UI state (active tab, character filters) and the favourites list
+- SQLite persists favourited characters for offline use; loaded into Redux on app start
+
+**State management split:**
+- React Query handles all server/async state (fetching, caching, pagination)
+- Redux manages UI state (active tab, character filters) and the favourites list
+- SQLite persists favourited characters for offline use; loaded into Redux on app start
