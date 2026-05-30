@@ -151,6 +151,12 @@ const styles = StyleSheet.create({
   },
 
   // Error / retry
+  emptyText: {
+    fontSize: 15,
+    color: '#888',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
   errorText: {
     fontSize: 15,
     color: '#D63D2E',

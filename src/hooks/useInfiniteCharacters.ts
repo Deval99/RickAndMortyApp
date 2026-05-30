@@ -3,6 +3,7 @@ import { CharacterService } from '../services/CharacterService';
 import type { CharacterFilters } from '../types/character';
 import type { Character } from '../types/character';
 import type { ApiError, PaginatedResponse } from '../types/api';
+import { useNetworkStatus } from './useNetworkStatus';
 
 export function getNextPageParam(
   lastPage: Pick<PaginatedResponse<unknown>, 'info'>,
@@ -16,12 +17,15 @@ export function getNextPageParam(
 export function useInfiniteCharacters(
   filters: CharacterFilters = {},
 ): UseInfiniteQueryResult<InfiniteData<PaginatedResponse<Character>>, ApiError> {
+  const { isOnline, isChecking } = useNetworkStatus();
+
   return useInfiniteQuery<PaginatedResponse<Character>, ApiError>({
     queryKey: ['characters', 'infinite', filters],
     queryFn: ({ pageParam }) =>
       CharacterService.getCharacters(pageParam as number, filters),
     initialPageParam: 1,
     getNextPageParam,
+    enabled: !isChecking && isOnline,
     retry: (failureCount, error) => {
       if (error?.statusCode === 404) return false;
       return failureCount < 2;

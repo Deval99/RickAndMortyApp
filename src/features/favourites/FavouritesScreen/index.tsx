@@ -12,9 +12,11 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import images from '../../../assets/images';
 import { CharacterCard } from '../../../components/CharacterCard';
+import { OfflineBanner } from '../../../components/OfflineBanner';
 import { CharacterListSkeleton } from '../../../components/SkeletonLoader';
 import { useCollapsibleControls } from '../../../hooks/useCollapsibleControls';
 import { useFavourites } from '../../../hooks/useFavourites';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import type { RootStackParamList, TabParamList } from '../../../navigation/AppNavigator';
 import type { Character } from '../../../types/character';
 import styles from './styles';
@@ -38,6 +40,7 @@ type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
 export function FavouritesScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
   const { characters, isLoading, reload } = useFavourites();
+  const { isOnline } = useNetworkStatus();
   const {
     controlsAnimatedStyle,
     controlsHeight,
@@ -63,6 +66,7 @@ export function FavouritesScreen({ navigation }: Props) {
   if (isLoading) {
     return (
       <View style={[styles.safeArea, { paddingTop: top }]}>
+        <OfflineBanner visible={!isOnline} />
         <Header />
         <CharacterListSkeleton count={4} />
       </View>
@@ -71,6 +75,7 @@ export function FavouritesScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
+      <OfflineBanner visible={!isOnline} />
       <View style={styles.content}>
         <Animated.View
           onLayout={handleControlsLayout}

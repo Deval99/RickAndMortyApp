@@ -3,9 +3,11 @@ import React from 'react';
 import { FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { SharedTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { OfflineBanner } from '../../../components/OfflineBanner';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { useCharacter } from '../../../hooks/useCharacter';
 import { useFavourite } from '../../../hooks/useFavourite';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import type { RootStackParamList } from '../../../navigation/AppNavigator';
 import { navigateToDetail } from '../../../utils/navigateToDetail';
 import {
@@ -44,6 +46,7 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
   const { characterId } = route.params;
   const { data: character, isLoading, isError, error, refetch } = useCharacter(characterId);
   const { isFavourite, toggle } = useFavourite(characterId, character);
+  const { isOnline } = useNetworkStatus();
 
   const emptyHeader = (
     <Header onBack={() => navigation.goBack()} title="" isFavourite={false} onToggle={() => {}} />
@@ -61,10 +64,20 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
   }
 
   if (isError || !character) {
+    const offlineAndNotCached = !isOnline;
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         {emptyHeader}
-        <ErrorView error={error} onRetry={refetch} />
+        <ErrorView
+          error={
+            offlineAndNotCached
+              ? { message: "You're offline and this character isn't saved in your favourites. Add it as a favourite while online to view it offline." }
+              : error
+          }
+          onRetry={refetch}
+          showRetry={isOnline}
+          isOffline={offlineAndNotCached}
+        />
       </SafeAreaView>
     );
   }
@@ -83,6 +96,8 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
         isFavourite={isFavourite}
         onToggle={toggle}
       />
+
+      <OfflineBanner visible={!isOnline} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -110,19 +125,8 @@ export function CharacterDetailScreen({ route, navigation }: Props) {
           <InfoRow label="Species" value={character.species} />
           {character.type ? <InfoRow label="Type" value={character.type} /> : null}
           <InfoRow label="Gender" value={character.gender} />
-          <InfoRow label="Created" value={createdDate} />
-        </View>
-
-        {/* ── Origin ── */}
-        <View style={styles.card}>
-          <SectionTitle title="Origin" />
-          <InfoRow label="Name" value={character.origin.name} />
-        </View>
-
-        {/* ── Last Known Location ── */}
-        <View style={styles.card}>
-          <SectionTitle title="Last Known Location" />
-          <InfoRow label="Name" value={character.location.name} />
+          <InfoRow label="Origin" value={character.origin.name} />
+          <InfoRow label="Last Known Location" value={character.location.name} />
         </View>
 
         {/* ── Episodes ── */}

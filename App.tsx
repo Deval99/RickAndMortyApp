@@ -31,7 +31,7 @@ function App() {
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <StatusBar barStyle={'dark-content'} />
           <AppNavigator />
         </SafeAreaProvider>
       </QueryClientProvider>

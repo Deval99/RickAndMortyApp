@@ -4,6 +4,7 @@ import { CharacterService } from '../services/CharacterService';
 import type { Episode } from '../types/episode';
 import type { Character } from '../types/character';
 import type { ApiError } from '../types/api';
+import { useNetworkStatus } from './useNetworkStatus';
 
 /** Extracts character ID from a URL like https://rickandmortyapi.com/api/character/5 */
 function extractCharacterId(url: string): number {
@@ -21,17 +22,21 @@ interface EpisodeWithCharacters {
 }
 
 export function useEpisodeWithCharacters(episodeId: number): EpisodeWithCharacters {
-  // Step 1: fetch the episode
+  const { isOnline, isChecking } = useNetworkStatus();
+  const canFetch = !isChecking && isOnline;
+
   const episodeQuery = useQuery<Episode, ApiError>({
     queryKey: ['episode', episodeId],
     queryFn: () => EpisodeService.getEpisodeById(episodeId),
+    enabled: canFetch,
+    retry: canFetch ? 2 : false,
+    staleTime: canFetch ? 1000 * 60 * 5 : Infinity,
   });
 
   const characterIds = (episodeQuery.data?.characters ?? [])
     .map(extractCharacterId)
     .filter(id => id > 0);
 
-  // Step 2: fetch all characters in one batch request (API supports comma-separated IDs)
   const charactersQuery = useQuery<Character[], ApiError>({
     queryKey: ['characters', 'batch', characterIds],
     queryFn: async () => {
@@ -40,12 +45,13 @@ export function useEpisodeWithCharacters(episodeId: number): EpisodeWithCharacte
         const single = await CharacterService.getCharacterById(characterIds[0] ?? 0);
         return [single];
       }
-      // Rick and Morty API supports /character/[1,2,3] for batch fetching
       const { get } = await import('../services/ApiClient');
       const result = await get<Character[]>(`/character/${characterIds.join(',')}`);
       return result;
     },
-    enabled: episodeQuery.isSuccess && characterIds.length > 0,
+    enabled: canFetch && episodeQuery.isSuccess && characterIds.length > 0,
+    retry: canFetch ? 2 : false,
+    staleTime: canFetch ? 1000 * 60 * 5 : Infinity,
   });
 
   const isLoading = episodeQuery.isLoading || (episodeQuery.isSuccess && charactersQuery.isLoading);

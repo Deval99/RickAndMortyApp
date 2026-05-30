@@ -11,8 +11,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '../../../assets/images';
 import { CharacterAvatar } from '../../../components/CharacterAvatar';
+import { OfflineBanner } from '../../../components/OfflineBanner';
 import { AvatarGridSkeleton } from '../../../components/SkeletonLoader';
 import { useEpisodeWithCharacters } from '../../../hooks/useEpisodeWithCharacters';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import type { RootStackParamList } from '../../../navigation/AppNavigator';
 import type { Character } from '../../../types/character';
 import { navigateToDetail } from '../../../utils/navigateToDetail';
@@ -35,6 +37,7 @@ export function EpisodeDetailScreen({ route, navigation }: Props) {
   const { episodeId } = route.params;
   const { episode, characters, isLoading, isError, error, refetch } =
     useEpisodeWithCharacters(episodeId);
+  const { isOnline } = useNetworkStatus();
 
   if (isLoading) {
     return (
@@ -60,16 +63,22 @@ export function EpisodeDetailScreen({ route, navigation }: Props) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <Header title="" onBack={() => navigation.goBack()} />
+        <OfflineBanner visible={!isOnline} />
         <View style={styles.centered}>
-          <Text style={styles.errorText}>
-            {(error as { message?: string })?.message ?? 'Failed to load episode'}
-          </Text>
-          <TouchableOpacity
-            onPress={() => refetch()}
-            accessibilityRole="button"
-          >
-            <Text style={styles.retryText}>Tap to retry</Text>
-          </TouchableOpacity>
+          {!isOnline ? (
+            <Text style={styles.emptyText}>
+              You're offline. Connect to the internet to view this episode.
+            </Text>
+          ) : (
+            <>
+              <Text style={styles.errorText}>
+                {(error as { message?: string })?.message ?? 'Failed to load episode'}
+              </Text>
+              <TouchableOpacity onPress={() => refetch()} accessibilityRole="button">
+                <Text style={styles.retryText}>Tap to retry</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </SafeAreaView>
     );
@@ -85,6 +94,8 @@ export function EpisodeDetailScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <Header title={episode.name} onBack={() => navigation.goBack()} />
+
+      <OfflineBanner visible={!isOnline} />
 
       {/* Episode meta */}
       <View style={styles.metaCard}>

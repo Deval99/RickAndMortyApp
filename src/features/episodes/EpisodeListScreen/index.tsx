@@ -2,7 +2,6 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import {
-  Image,
   SectionList,
   SectionListRenderItem,
   Text,
@@ -11,13 +10,15 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import images from '../../../assets/images';
+import { OfflineBanner } from '../../../components/OfflineBanner';
 import { EpisodeListSkeleton } from '../../../components/SkeletonLoader';
+import { useAllEpisodes, type EpisodeSeason } from '../../../hooks/useAllEpisodes';
 import { useCollapsibleControls } from '../../../hooks/useCollapsibleControls';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import type { TabParamList } from '../../../navigation/AppNavigator';
 import type { RootStackParamList } from '../../../navigation/AppNavigator';
 import type { Episode } from '../../../types/episode';
-import { useAllEpisodes, type EpisodeSeason } from '../../../hooks/useAllEpisodes';
+import { EpisodeRow, ScreenHeader } from './EpisodeListComponents';
 import styles from './styles';
 
 type TabProps = BottomTabScreenProps<TabParamList, 'EpisodesPaginated'>;
@@ -37,6 +38,7 @@ type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
  */
 export function EpisodeListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
+  const { isOnline } = useNetworkStatus();
   const {
     controlsAnimatedStyle,
     controlsHeight,
@@ -80,6 +82,19 @@ export function EpisodeListScreen({ navigation }: Props) {
     );
   }
 
+  if (!isOnline && seasons.length === 0) {
+    return (
+      <View style={[styles.safeArea, { paddingTop: top }]}>
+        <OfflineBanner visible />
+        <ScreenHeader />
+        <View style={styles.centered}>
+          <Text style={styles.emptyText}>You're offline</Text>
+          <Text style={styles.emptyText}>Connect to the internet to browse episodes.</Text>
+        </View>
+      </View>
+    );
+  }
+
   if (isError) {
     return (
       <View style={[styles.safeArea, { paddingTop: top }]}>
@@ -102,6 +117,7 @@ export function EpisodeListScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
+      <OfflineBanner visible={!isOnline} />
       <View style={styles.content}>
         <Animated.View
           onLayout={handleControlsLayout}
@@ -136,58 +152,3 @@ export function EpisodeListScreen({ navigation }: Props) {
     </View>
   );
 }
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-/**
- * Static header that displays the "Episodes" screen title.
- */
-function ScreenHeader() {
-  return (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>Episodes</Text>
-    </View>
-  );
-}
-
-/**
- * Props for the {@link EpisodeRow} sub-component.
- */
-interface EpisodeRowProps {
-  /** The episode data to display. */
-  episode: Episode;
-  /** Called when the row is tapped. */
-  onPress: () => void;
-}
-
-/**
- * A single tappable row in the episode section list.
- *
- * Shows the episode code badge (e.g. `S01E03`), the episode name, and its
- * air date, with a chevron on the right.
- */
-function EpisodeRow({ episode, onPress }: EpisodeRowProps) {
-  return (
-    <TouchableOpacity
-      style={styles.row}
-      onPress={onPress}
-      activeOpacity={0.75}
-      accessibilityRole="button"
-      accessibilityLabel={`${episode.episode} – ${episode.name}`}
-    >
-      <View style={styles.episodeBadge}>
-        <Text style={styles.episodeCode}>{episode.episode}</Text>
-      </View>
-      <View style={styles.rowInfo}>
-        <Text style={styles.rowName} numberOfLines={1}>
-          {episode.name}
-        </Text>
-        <Text style={styles.rowMeta}>{episode.air_date}</Text>
-      </View>
-      <Image source={images.icLeftArrow} style={styles.rowChevron} resizeMode="contain" />
-    </TouchableOpacity>
-  );
-}
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-

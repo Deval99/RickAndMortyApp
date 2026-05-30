@@ -9,14 +9,17 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import images from '../../../assets/images';
 import { CharacterAvatar } from '../../../components/CharacterAvatar';
+import { OfflineBanner } from '../../../components/OfflineBanner';
 import { AvatarGridSkeleton } from '../../../components/SkeletonLoader';
 import { useLocationWithResidents } from '../../../hooks/useLocationWithResidents';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import type { RootStackParamList } from '../../../navigation/AppNavigator';
 import type { Character } from '../../../types/character';
 import { navigateToDetail } from '../../../utils/navigateToDetail';
-import styles, { ACCENT } from './styles';
+import { Header, InfoRow, LoadingSkeleton } from './LocationDetailComponents';
+import styles from './styles';
+import images from '../../../assets/images';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LocationDetail'>;
 
@@ -34,27 +37,13 @@ export function LocationDetailScreen({ route, navigation }: Props) {
   const { locationId } = route.params;
   const { location, residents, isLoading, isError, error, refetch } =
     useLocationWithResidents(locationId);
+  const { isOnline } = useNetworkStatus();
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <Header title="" onBack={() => navigation.goBack()} />
-        {/* Meta card skeleton */}
-        <View style={[styles.metaCard, { gap: 10 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#e0e0e0' }} />
-            <View style={{ flex: 1, gap: 6 }}>
-              <View style={{ width: '60%', height: 18, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
-            </View>
-          </View>
-          <View style={{ width: '100%', height: 1, backgroundColor: '#f0f0f0' }} />
-          {[1, 2].map(i => (
-            <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={{ width: '30%', height: 14, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
-              <View style={{ width: '45%', height: 14, borderRadius: 4, backgroundColor: '#e0e0e0' }} />
-            </View>
-          ))}
-        </View>
+        <LoadingSkeleton />
         <AvatarGridSkeleton count={9} />
       </SafeAreaView>
     );
@@ -64,13 +53,22 @@ export function LocationDetailScreen({ route, navigation }: Props) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <Header title="" onBack={() => navigation.goBack()} />
+        <OfflineBanner visible={!isOnline} />
         <View style={styles.centered}>
-          <Text style={styles.errorText}>
-            {(error as { message?: string })?.message ?? 'Failed to load location'}
-          </Text>
-          <TouchableOpacity onPress={() => refetch()} accessibilityRole="button">
-            <Text style={styles.retryText}>Tap to retry</Text>
-          </TouchableOpacity>
+          {!isOnline ? (
+            <Text style={styles.emptyText}>
+              You're offline. Connect to the internet to view this location.
+            </Text>
+          ) : (
+            <>
+              <Text style={styles.errorText}>
+                {(error as { message?: string })?.message ?? 'Failed to load location'}
+              </Text>
+              <TouchableOpacity onPress={() => refetch()} accessibilityRole="button">
+                <Text style={styles.retryText}>Tap to retry</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </SafeAreaView>
     );
@@ -128,6 +126,8 @@ export function LocationDetailScreen({ route, navigation }: Props) {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <Header title={location.name} onBack={() => navigation.goBack()} />
 
+      <OfflineBanner visible={!isOnline} />
+
       <FlatList
         data={residents}
         keyExtractor={item => String(item.id)}
@@ -141,60 +141,3 @@ export function LocationDetailScreen({ route, navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-/**
- * Props for the internal {@link Header} sub-component.
- */
-interface HeaderProps {
-  /** Screen title shown in the centre of the header. */
-  title: string;
-  /** Callback fired when the back button is pressed. */
-  onBack: () => void;
-}
-
-/**
- * Navigation header for the location detail screen.
- *
- * Contains a back button on the left and the location name centred in the bar.
- */
-function Header({ title, onBack }: HeaderProps) {
-  return (
-    <View style={styles.header}>
-      <TouchableOpacity
-        onPress={onBack}
-        style={styles.backBtn}
-        accessibilityRole="button"
-        accessibilityLabel="Go back"
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <Image source={images.icLeftArrow} style={styles.backIcon} resizeMode="contain" />
-      </TouchableOpacity>
-      <Text style={styles.headerTitle} numberOfLines={1}>
-        {title}
-      </Text>
-      <View style={styles.backBtn} />
-    </View>
-  );
-}
-
-/**
- * A single label/value row inside the location meta card.
- *
- * @param label - Left-aligned descriptor text (e.g. `"Type"`).
- * @param value - Right-aligned value text (e.g. `"Planet"`).
- */
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue} numberOfLines={2}>
-        {value}
-      </Text>
-    </View>
-  );
-}
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-

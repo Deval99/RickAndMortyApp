@@ -19,6 +19,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 32,
   },
+  offlineText: {
+    fontSize: 15,
+    color: '#888',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
   retryText: {
     fontSize: 14,
     color: ACCENT,
@@ -130,7 +136,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1a1a2e',
     fontWeight: '600',
-    flex: 2,
+    flex: 1,
     textAlign: 'right',
   },
 

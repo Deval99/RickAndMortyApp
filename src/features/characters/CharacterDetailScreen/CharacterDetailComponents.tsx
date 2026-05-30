@@ -106,20 +106,26 @@ export function LoadingView() {
 interface ErrorViewProps {
   error: unknown;
   onRetry: () => void;
+  /** When `false` the retry button is hidden (e.g. when the device is offline). */
+  showRetry?: boolean;
+  /** When `true` the message is styled as a neutral info text, not a red error. */
+  isOffline?: boolean;
 }
 
 /**
  * Error state shown when the character fetch fails.
  */
-export function ErrorView({ error, onRetry }: ErrorViewProps) {
+export function ErrorView({ error, onRetry, showRetry = true, isOffline = false }: ErrorViewProps) {
   return (
     <View style={styles.centered}>
-      <Text style={styles.errorText}>
+      <Text style={isOffline ? styles.offlineText : styles.errorText}>
         {(error as { message?: string })?.message ?? 'Failed to load character'}
       </Text>
-      <TouchableOpacity onPress={onRetry} accessibilityRole="button">
-        <Text style={styles.retryText}>Tap to retry</Text>
-      </TouchableOpacity>
+      {showRetry && (
+        <TouchableOpacity onPress={onRetry} accessibilityRole="button">
+          <Text style={styles.retryText}>Tap to retry</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

@@ -10,6 +10,24 @@ function getDatabase(): QuickSQLiteConnection {
   return db;
 }
 
+/** Maps a raw SQLite row to a typed {@link Character} object. */
+function rowToCharacter(row: Record<string, unknown>): Character {
+  return {
+    id: row.id as number,
+    name: row.name as string,
+    status: row.status as Character['status'],
+    species: row.species as string,
+    type: row.type as string,
+    gender: row.gender as Character['gender'],
+    image: row.image as string,
+    url: row.url as string,
+    created: row.created as string,
+    origin: { name: row.origin_name as string, url: row.origin_url as string },
+    location: { name: row.location_name as string, url: row.location_url as string },
+    episode: JSON.parse((row.episode as string) || '[]') as string[],
+  };
+}
+
 export const DatabaseService = {
   initDatabase: async (): Promise<void> => {
     try {
@@ -113,6 +131,20 @@ export const DatabaseService = {
     }
   },
 
+  /** Return a single cached character by ID, or `null` if not in the cache. */
+  getCharacterById: async (id: number): Promise<Character | null> => {
+    try {
+      const result = getDatabase().execute(
+        'SELECT * FROM characters WHERE id = ? LIMIT 1',
+        [id],
+      );
+      const row = result.rows?._array?.[0] as Record<string, unknown> | undefined;
+      return row ? rowToCharacter(row) : null;
+    } catch {
+      return null;
+    }
+  },
+
   /** Return all characters that are currently in the favourites table. */
   getFavouriteCharacters: async (): Promise<Character[]> => {
     try {
@@ -121,20 +153,9 @@ export const DatabaseService = {
          INNER JOIN favourites f ON c.id = f.id
          ORDER BY c.name ASC`,
       );
-      return (result.rows?._array ?? []).map((row: Record<string, unknown>) => ({
-        id: row.id as number,
-        name: row.name as string,
-        status: row.status as Character['status'],
-        species: row.species as string,
-        type: row.type as string,
-        gender: row.gender as Character['gender'],
-        image: row.image as string,
-        url: row.url as string,
-        created: row.created as string,
-        origin: { name: row.origin_name as string, url: row.origin_url as string },
-        location: { name: row.location_name as string, url: row.location_url as string },
-        episode: JSON.parse((row.episode as string) || '[]') as string[],
-      }));
+      return (result.rows?._array ?? []).map(
+        (row: Record<string, unknown>) => rowToCharacter(row),
+      );
     } catch {
       return [];
     }
@@ -142,49 +163,23 @@ export const DatabaseService = {
 
   addFavourite: async (id: number): Promise<void> => {
     try {
-      getDatabase().execute(
-        'INSERT OR IGNORE INTO favourites (id) VALUES (?)',
-        [id],
-      );
+      getDatabase().execute('INSERT OR IGNORE INTO favourites (id) VALUES (?)', [id]);
     } catch (error) {
-      const dbError: DatabaseError = {
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Failed to add favourite',
-        originalError: error,
-      };
-
-      throw dbError;
+      throw { message: error instanceof Error ? error.message : 'Failed to add favourite', originalError: error } as DatabaseError;
     }
   },
 
   removeFavourite: async (id: number): Promise<void> => {
     try {
-      getDatabase().execute(
-        'DELETE FROM favourites WHERE id = ?',
-        [id],
-      );
+      getDatabase().execute('DELETE FROM favourites WHERE id = ?', [id]);
     } catch (error) {
-      const dbError: DatabaseError = {
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Failed to remove favourite',
-        originalError: error,
-      };
-
-      throw dbError;
+      throw { message: error instanceof Error ? error.message : 'Failed to remove favourite', originalError: error } as DatabaseError;
     }
   },
 
   isFavourite: async (id: number): Promise<boolean> => {
     try {
-      const result = getDatabase().execute(
-        'SELECT id FROM favourites WHERE id = ? LIMIT 1',
-        [id],
-      );
-
+      const result = getDatabase().execute('SELECT id FROM favourites WHERE id = ? LIMIT 1', [id]);
       return (result.rows?._array?.length ?? 0) > 0;
     } catch {
       return false;
@@ -193,13 +188,8 @@ export const DatabaseService = {
 
   getAllFavouriteIds: async (): Promise<number[]> => {
     try {
-      const result = getDatabase().execute(
-        'SELECT id FROM favourites',
-      );
-
-      return (result.rows?._array ?? []).map(
-        (row: { id: number }) => row.id,
-      );
+      const result = getDatabase().execute('SELECT id FROM favourites');
+      return (result.rows?._array ?? []).map((row: { id: number }) => row.id);
     } catch {
       return [];
     }

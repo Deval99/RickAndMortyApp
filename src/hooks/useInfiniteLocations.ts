@@ -2,6 +2,7 @@ import { useInfiniteQuery, UseInfiniteQueryResult, InfiniteData } from '@tanstac
 import { LocationService } from '../services/LocationService';
 import type { FullLocation } from '../types/location';
 import type { ApiError, PaginatedResponse } from '../types/api';
+import { useNetworkStatus } from './useNetworkStatus';
 
 function getNextPageParam(
   lastPage: Pick<PaginatedResponse<unknown>, 'info'>,
@@ -16,10 +17,13 @@ export function useInfiniteLocations(): UseInfiniteQueryResult<
   InfiniteData<PaginatedResponse<FullLocation>>,
   ApiError
 > {
+  const { isOnline, isChecking } = useNetworkStatus();
+
   return useInfiniteQuery<PaginatedResponse<FullLocation>, ApiError>({
     queryKey: ['locations', 'infinite'],
     queryFn: ({ pageParam }) => LocationService.getLocationsPage(pageParam as number),
     initialPageParam: 1,
     getNextPageParam,
+    enabled: !isChecking && isOnline,
   });
 }

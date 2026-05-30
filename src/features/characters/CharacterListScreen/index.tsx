@@ -11,10 +11,12 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CharacterCard } from '../../../components/CharacterCard';
 import { FilterBar } from '../../../components/FilterBar';
+import { OfflineBanner } from '../../../components/OfflineBanner';
 import { SearchBar } from '../../../components/SearchBar';
-import { CharacterCardSkeleton, CharacterListSkeleton } from '../../../components/SkeletonLoader';
 import { useCollapsibleControls } from '../../../hooks/useCollapsibleControls';
+import { CharacterListEmpty, CharacterListFooter } from './CharacterListComponents';
 import { useInfiniteCharacters } from '../../../hooks/useInfiniteCharacters';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import type { RootStackParamList, TabParamList } from '../../../navigation/AppNavigator';
 import {
   setGenderFilter,
@@ -71,6 +73,7 @@ function toApiGender(g: DisplayGender): CharacterFilters['gender'] | undefined {
 export function CharacterListScreen({ navigation }: Props) {
   const { top } = useSafeAreaInsets();
   const dispatch = useAppDispatch();
+  const { isOnline } = useNetworkStatus();
 
   // ── Filters from Redux (global UI state) ──────────────────────────────────
   const search = useAppSelector(state => state.ui.characterFilters.search);
@@ -135,44 +138,27 @@ export function CharacterListScreen({ navigation }: Props) {
 
   const keyExtractor = useCallback((item: Character) => String(item.id), []);
 
-  const ListFooter = () => {
-    if (!hasNextPage) return null;
-    return <CharacterCardSkeleton />;
-  };
+  const ListFooter = useCallback(
+    () => <CharacterListFooter hasNextPage={!!hasNextPage} />,
+    [hasNextPage],
+  );
 
-  const ListEmpty = () => {
-    if (isLoading) {
-      return <CharacterListSkeleton count={6} />;
-    }
-    if (isError) {
-      const is404 = (error as { statusCode?: number })?.statusCode === 404;
-      if (is404) {
-        return (
-          <View style={styles.centered}>
-            <Text style={styles.emptyText}>No data found</Text>
-          </View>
-        );
-      }
-      return (
-        <View style={styles.centered}>
-          <Text style={styles.errorText}>
-            {(error as { message?: string })?.message ?? 'Something went wrong'}
-          </Text>
-          <Text style={styles.retryText} onPress={() => refetch()}>
-            Tap to retry
-          </Text>
-        </View>
-      );
-    }
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.emptyText}>No characters found</Text>
-      </View>
-    );
-  };
+  const ListEmpty = useCallback(
+    () => (
+      <CharacterListEmpty
+        isLoading={isLoading}
+        isOnline={isOnline}
+        isError={isError}
+        error={error}
+        onRetry={refetch}
+      />
+    ),
+    [isLoading, isOnline, isError, error, refetch],
+  );
 
   return (
     <View style={[styles.safeArea, { paddingTop: top }]}>
+      <OfflineBanner visible={!isOnline} />
       <View style={styles.content}>
         <Animated.View
           onLayout={handleControlsLayout}

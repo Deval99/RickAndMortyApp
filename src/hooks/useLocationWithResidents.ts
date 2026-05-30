@@ -4,6 +4,7 @@ import { CharacterService } from '../services/CharacterService';
 import type { FullLocation } from '../types/location';
 import type { Character } from '../types/character';
 import type { ApiError } from '../types/api';
+import { useNetworkStatus } from './useNetworkStatus';
 
 /** Extracts character ID from a URL like https://rickandmortyapi.com/api/character/5 */
 function extractCharacterId(url: string): number {
@@ -21,17 +22,21 @@ interface LocationWithResidents {
 }
 
 export function useLocationWithResidents(locationId: number): LocationWithResidents {
-  // Step 1: fetch the location
+  const { isOnline, isChecking } = useNetworkStatus();
+  const canFetch = !isChecking && isOnline;
+
   const locationQuery = useQuery<FullLocation, ApiError>({
     queryKey: ['location', locationId],
     queryFn: () => LocationService.getLocationById(locationId),
+    enabled: canFetch,
+    retry: canFetch ? 2 : false,
+    staleTime: canFetch ? 1000 * 60 * 5 : Infinity,
   });
 
   const characterIds = (locationQuery.data?.residents ?? [])
     .map(extractCharacterId)
     .filter(id => id > 0);
 
-  // Step 2: batch-fetch all residents (API supports comma-separated IDs)
   const residentsQuery = useQuery<Character[], ApiError>({
     queryKey: ['characters', 'batch', characterIds],
     queryFn: async () => {
@@ -44,7 +49,9 @@ export function useLocationWithResidents(locationId: number): LocationWithReside
       const result = await get<Character[]>(`/character/${characterIds.join(',')}`);
       return result;
     },
-    enabled: locationQuery.isSuccess && characterIds.length > 0,
+    enabled: canFetch && locationQuery.isSuccess && characterIds.length > 0,
+    retry: canFetch ? 2 : false,
+    staleTime: canFetch ? 1000 * 60 * 5 : Infinity,
   });
 
   const isLoading =

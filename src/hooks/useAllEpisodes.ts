@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { EpisodeService } from '../services/EpisodeService';
 import type { Episode } from '../types/episode';
 import type { ApiError, PaginatedResponse } from '../types/api';
+import { useNetworkStatus } from './useNetworkStatus';
 
 export interface EpisodeSeason {
   season: number;
@@ -17,6 +18,9 @@ function parseSeason(episodeCode: string): number {
 }
 
 export function useAllEpisodes() {
+  const { isOnline, isChecking } = useNetworkStatus();
+  const canFetch = !isChecking && isOnline;
+
   const query = useInfiniteQuery<PaginatedResponse<Episode>, ApiError>({
     queryKey: ['episodes', 'all'],
     queryFn: ({ pageParam }) => EpisodeService.getEpisodesPage(pageParam as number),
@@ -27,17 +31,16 @@ export function useAllEpisodes() {
       const page = url.searchParams.get('page');
       return page !== null ? Number(page) : undefined;
     },
+    enabled: canFetch,
   });
 
-  // Auto-fetch all pages once the first resolves
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = query;
 
-  // Trigger fetching remaining pages automatically
   useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
+    if (canFetch && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [canFetch, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   /** All episodes flattened and grouped by season */
   const seasons: EpisodeSeason[] = useMemo(() => {
@@ -65,6 +68,6 @@ export function useAllEpisodes() {
     ...query,
     seasons,
     totalLoaded,
-    isLoadingAll: query.isLoading || hasNextPage,
+    isLoadingAll: query.isLoading || (canFetch && hasNextPage),
   };
 }
