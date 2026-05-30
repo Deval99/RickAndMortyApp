@@ -3,8 +3,6 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import images from '../../../assets/images';
 import styles from './styles';
 
-// ─── Header ──────────────────────────────────────────────────────────────────
-
 interface HeaderProps {
   onBack: () => void;
   title: string;
@@ -53,20 +51,12 @@ export function Header({ onBack, title, isFavourite, onToggle }: HeaderProps) {
   );
 }
 
-// ─── SectionTitle ─────────────────────────────────────────────────────────────
-
-/**
- * Uppercase section title label used inside info cards.
- */
+/** Uppercase section title label used inside info cards. */
 export function SectionTitle({ title }: { title: string }) {
   return <Text style={styles.sectionTitle}>{title}</Text>;
 }
 
-// ─── InfoRow ──────────────────────────────────────────────────────────────────
-
-/**
- * A single label/value row inside an info card.
- */
+/** A single label/value row inside an info card. */
 export function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.infoRow}>
@@ -76,11 +66,7 @@ export function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-// ─── LoadingView ──────────────────────────────────────────────────────────────
-
-/**
- * Skeleton placeholder layout shown while character data is loading.
- */
+/** Skeleton placeholder layout shown while character data is loading. */
 export function LoadingView() {
   return (
     <>
@@ -101,8 +87,6 @@ export function LoadingView() {
   );
 }
 
-// ─── ErrorView ────────────────────────────────────────────────────────────────
-
 interface ErrorViewProps {
   error: unknown;
   onRetry: () => void;
@@ -112,9 +96,7 @@ interface ErrorViewProps {
   isOffline?: boolean;
 }
 
-/**
- * Error state shown when the character fetch fails.
- */
+/** Error state shown when the character fetch fails. */
 export function ErrorView({ error, onRetry, showRetry = true, isOffline = false }: ErrorViewProps) {
   return (
     <View style={styles.centered}>

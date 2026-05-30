@@ -29,7 +29,6 @@ import type { DisplayGender, DisplayStatus } from '../../../store/slices/uiSlice
 import type { Character, CharacterFilters } from '../../../types/character';
 import { styles } from './styles';
 
-// Tab screen props combined with root stack navigation for cross-stack navigation
 type TabProps = BottomTabScreenProps<TabParamList, 'CharacterList'>;
 type StackNav = NativeStackScreenProps<RootStackParamList>['navigation'];
 type Props = TabProps & { navigation: TabProps['navigation'] & StackNav };
@@ -75,7 +74,6 @@ export function CharacterListScreen({ navigation }: Props) {
   const dispatch = useAppDispatch();
   const { isOnline } = useNetworkStatus();
 
-  // ── Filters from Redux (global UI state) ──────────────────────────────────
   const search = useAppSelector(state => state.ui.characterFilters.search);
   const status = useAppSelector(state => state.ui.characterFilters.status);
   const gender = useAppSelector(state => state.ui.characterFilters.gender);

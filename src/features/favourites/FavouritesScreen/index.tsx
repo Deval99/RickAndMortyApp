@@ -49,8 +49,6 @@ export function FavouritesScreen({ navigation }: Props) {
     handleScroll,
   } = useCollapsibleControls();
 
-  // Reload whenever the tab comes into focus so removals on the detail screen
-  // are reflected immediately.
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', reload);
     return unsubscribe;

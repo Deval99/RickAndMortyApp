@@ -6,8 +6,8 @@ import type { Character } from '../types/character';
 
 // Grid constants — must match the FlatList's contentContainerStyle padding and columnWrapperStyle gap
 const NUM_COLUMNS = 3;
-const GRID_HORIZONTAL_PADDING = 12; // paddingHorizontal on contentContainerStyle (each side)
-const COLUMN_GAP = 8; // gap in columnWrapperStyle
+const GRID_HORIZONTAL_PADDING = 12;
+const COLUMN_GAP = 8;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH =
   (SCREEN_WIDTH - GRID_HORIZONTAL_PADDING * 2 - COLUMN_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
@@ -81,10 +81,6 @@ export function CharacterAvatar({ character, onPress }: CharacterAvatarProps) {
     </Pressable>
   );
 }
-
-// Total gaps per row = (NUM_COLUMNS - 1) * COLUMN_GAP
-// Total side padding = GRID_HORIZONTAL_PADDING * 2
-// Item width = (screenWidth - totalPadding - totalGaps) / NUM_COLUMNS
 
 const styles = StyleSheet.create({
   container: {

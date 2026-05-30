@@ -3,8 +3,6 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import images from '../../../assets/images';
 import styles from './styles';
 
-// ─── Header ──────────────────────────────────────────────────────────────────
-
 interface HeaderProps {
   title: string;
   onBack: () => void;
@@ -30,8 +28,6 @@ export function Header({ title, onBack }: HeaderProps) {
   );
 }
 
-// ─── InfoRow ─────────────────────────────────────────────────────────────────
-
 export function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.infoRow}>
@@ -42,8 +38,6 @@ export function InfoRow({ label, value }: { label: string; value: string }) {
     </View>
   );
 }
-
-// ─── LoadingSkeleton ─────────────────────────────────────────────────────────
 
 export function LoadingSkeleton() {
   return (

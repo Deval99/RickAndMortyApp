@@ -20,7 +20,7 @@ export function OfflineBanner({ visible }: OfflineBannerProps) {
     Animated.timing(animatedHeight, {
       toValue: visible ? BANNER_HEIGHT : 0,
       duration: 250,
-      useNativeDriver: false, // height animation requires JS driver
+      useNativeDriver: false,
     }).start();
   }, [visible, animatedHeight]);
 

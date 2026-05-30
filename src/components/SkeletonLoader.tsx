@@ -3,8 +3,6 @@ import { View, ViewStyle } from 'react-native';
 import { Shimmer } from './Shimmer';
 import styles from './skeletonStyles';
 
-// Character card skeleton
-
 /** Single skeleton placeholder that mirrors the layout of {@link CharacterCard}. */
 export function CharacterCardSkeleton() {
   return (
@@ -34,8 +32,6 @@ export function CharacterListSkeleton({ count = 6 }: { count?: number }) {
   );
 }
 
-// Episode row skeleton
-
 /** Single skeleton placeholder that mirrors the layout of an episode list row. */
 export function EpisodeRowSkeleton() {
   return (
@@ -62,8 +58,6 @@ export function EpisodeListSkeleton({ count = 8 }: { count?: number }) {
     </>
   );
 }
-
-// Location card skeleton
 
 interface LocationCardSkeletonProps {
   /** Optional style overrides for the outer card container. */
@@ -102,8 +96,6 @@ export function LocationListSkeleton({ count = 6 }: { count?: number }) {
     </>
   );
 }
-
-// Avatar grid skeleton (used in detail screens)
 
 /**
  * Grid of avatar-card skeleton placeholders used on episode and location

@@ -27,7 +27,7 @@ export function useCharacter(characterId: number): UseQueryResult<Character, Api
   return useQuery<Character, ApiError>({
     queryKey: ['character', characterId],
     queryFn: async () => {
-      // Offline + cached in SQLite → serve from local DB
+      // offline + cached → serve from SQLite instead of hitting the network
       if (!isOnline && isFavourite) {
         const cached = await DatabaseService.getCharacterById(characterId);
         if (cached) return cached;

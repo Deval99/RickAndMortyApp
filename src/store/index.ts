@@ -14,16 +14,12 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
-// Re-export hooks
 export { useAppDispatch, useAppSelector } from './hooks';
 
-// Re-export character slice actions
 export { fetchCharacterById } from './slices/characterSlice';
 
-// Re-export favourites slice thunks
 export { loadFavourites, addFavourite, removeFavourite } from './slices/favouritesSlice';
 
-// Re-export ui slice actions
 export {
   setActiveTab,
   setSearchFilter,

@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { TabParamList } from '../../navigation/AppNavigator';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 /** Display-cased values that the FilterBar works with (empty string = no filter). */
 export type DisplayStatus = 'Alive' | 'Dead' | 'unknown' | '';
 export type DisplayGender = 'Female' | 'Male' | 'Genderless' | 'unknown' | '';
@@ -20,8 +18,6 @@ export interface UIState {
   characterFilters: CharacterFilterState;
 }
 
-// ─── Initial state ────────────────────────────────────────────────────────────
-
 const initialState: UIState = {
   activeTab: 'CharacterList',
   characterFilters: {
@@ -30,8 +26,6 @@ const initialState: UIState = {
     gender: '',
   },
 };
-
-// ─── Slice ────────────────────────────────────────────────────────────────────
 
 const uiSlice = createSlice({
   name: 'ui',

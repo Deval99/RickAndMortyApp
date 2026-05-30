@@ -1,12 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
- * useDebounce<T>
- *
  * Returns a debounced copy of `value` that only updates after `delayMs`
  * milliseconds have elapsed since the last change.
- *
- * Written from scratch — no lodash dependency.
  *
  * @param value   The value to debounce.
  * @param delayMs Debounce delay in milliseconds (default: 300).

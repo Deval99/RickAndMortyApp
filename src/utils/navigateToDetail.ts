@@ -19,13 +19,11 @@ export function navigateToDetail<RouteName extends 'CharacterDetail' | 'EpisodeD
   const state = navigation.getState();
   const routes = state?.routes ?? [];
 
-  // Find the most recent occurrence of this route in the stack
   const existingIndex = [...routes].reverse().findIndex(r => r.name === routeName);
 
   if (existingIndex !== -1) {
     const forwardIndex = routes.length - 1 - existingIndex;
 
-    // Rebuild the stack up to (and including) the target screen with updated params
     type RouteEntry = (typeof routes)[number];
     const newRoutes = routes.slice(0, forwardIndex + 1).map((r: RouteEntry, i: number) =>
       i === forwardIndex ? { ...r, params } : r,

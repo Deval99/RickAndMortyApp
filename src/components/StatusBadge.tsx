@@ -12,9 +12,6 @@ interface Props {
 
 /**
  * Colour map from status value to its brand colour.
- * - Alive → green
- * - Dead  → red
- * - unknown → grey
  */
 const STATUS_COLORS: Record<Character['status'], string> = {
   Alive: '#55CC44',

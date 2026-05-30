@@ -6,7 +6,6 @@ interface TimedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _startTime?: number;
 }
 
-// ─── 429 rate-limit pause ───────────────────────────────────────────────────
 const RATE_LIMIT_PAUSE_MS = 5000;
 let rateLimitedUntil = 0;
 
@@ -15,9 +14,8 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
-// ─── Request interceptor ────────────────────────────────────────────────────
+// Request interceptor — stamps start time and blocks during 429 cooldown
 apiClient.interceptors.request.use((config: TimedAxiosRequestConfig) => {
-  // Block requests while we're in the 429 cooldown window
   const remaining = rateLimitedUntil - Date.now();
   if (remaining > 0) {
     console.warn(`[API] ⏸ Request blocked — rate limited for ${remaining}ms more`);
@@ -29,7 +27,6 @@ apiClient.interceptors.request.use((config: TimedAxiosRequestConfig) => {
     return Promise.reject(apiError);
   }
 
-  // Stamp the start time so we can compute duration on response
   config._startTime = Date.now();
 
   console.log(
@@ -41,7 +38,7 @@ apiClient.interceptors.request.use((config: TimedAxiosRequestConfig) => {
   return config;
 });
 
-// ─── Response interceptor ───────────────────────────────────────────────────
+// Response interceptor — logs timing and handles 429 rate-limit errors
 apiClient.interceptors.response.use(
   (response) => {
     const cfg = response.config as TimedAxiosRequestConfig;
@@ -81,7 +78,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(apiError);
     }
 
-    // Non-Axios error — wrap it
+    // Non-Axios errors still get wrapped so callers always see ApiError shape
     console.error('[API] ❌ Unexpected error:', error);
     const apiError: ApiError = {
       message: error instanceof Error ? error.message : 'Unknown error',

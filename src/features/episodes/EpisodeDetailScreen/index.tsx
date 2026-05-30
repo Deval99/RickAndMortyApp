@@ -127,11 +127,6 @@ export function EpisodeDetailScreen({ route, navigation }: Props) {
   );
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-/**
- * Props for the internal {@link Header} sub-component.
- */
 interface HeaderProps {
   /** Screen title shown in the centre of the header. */
   title: string;
@@ -163,6 +158,4 @@ function Header({ title, onBack }: HeaderProps) {
     </View>
   );
 }
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
 

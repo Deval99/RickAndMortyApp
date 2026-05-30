@@ -2,8 +2,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { DatabaseService } from '../../database/DatabaseService';
 import type { Character } from '../../types/character';
 
-// ─── State ────────────────────────────────────────────────────────────────────
-
 export interface FavouritesState {
   /** Full character objects loaded from SQLite */
   characters: Character[];
@@ -19,8 +17,6 @@ const initialState: FavouritesState = {
   status: 'idle',
   error: null,
 };
-
-// ─── Thunks ───────────────────────────────────────────────────────────────────
 
 /** Load all favourited characters from SQLite into Redux. */
 export const loadFavourites = createAsyncThunk<Character[]>(
@@ -50,14 +46,11 @@ export const removeFavourite = createAsyncThunk<number, number>(
   },
 );
 
-// ─── Slice ────────────────────────────────────────────────────────────────────
-
 const favouritesSlice = createSlice({
   name: 'favourites',
   initialState,
   reducers: {},
   extraReducers: builder => {
-    // ── loadFavourites ──
     builder
       .addCase(loadFavourites.pending, state => {
         state.status = 'loading';
@@ -73,7 +66,6 @@ const favouritesSlice = createSlice({
         state.error = action.error.message ?? 'Failed to load favourites';
       });
 
-    // ── addFavourite ──
     builder
       .addCase(addFavourite.fulfilled, (state, action) => {
         const character = action.payload;
@@ -83,7 +75,6 @@ const favouritesSlice = createSlice({
         }
       });
 
-    // ── removeFavourite ──
     builder
       .addCase(removeFavourite.fulfilled, (state, action) => {
         const id = action.payload;

@@ -21,7 +21,6 @@ export function useNetworkStatus(): NetworkStatus {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Fetch current state immediately so we don't wait for a change event
     NetInfo.fetch().then((state: NetInfoState) => {
       setIsOnline(resolveOnline(state));
       setIsChecking(false);
@@ -40,7 +39,7 @@ export function useNetworkStatus(): NetworkStatus {
 
 function resolveOnline(state: NetInfoState): boolean {
   if (!state.isConnected) return false;
-  // isInternetReachable is null on some platforms — treat null as reachable
+  // null means the platform doesn't report reachability — treat as online
   if (state.isInternetReachable === false) return false;
   return true;
 }

@@ -33,7 +33,7 @@ export const DatabaseService = {
     try {
       const database = getDatabase();
 
-      // Full character cache table (used by Favourites offline screen)
+      // Full character cache table (used by the Favourites offline screen)
       database.execute(
         `CREATE TABLE IF NOT EXISTS characters (
         id            INTEGER PRIMARY KEY,

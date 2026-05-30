@@ -14,8 +14,6 @@ import { LocationListScreen } from '../features/locations/LocationListScreen';
 import { setActiveTab } from '../store';
 import { useAppDispatch } from '../store/hooks';
 
-// ─── Param lists ─────────────────────────────────────────────────────────────
-
 /**
  * Root stack navigator param list.
  *
@@ -24,11 +22,8 @@ import { useAppDispatch } from '../store/hooks';
 export type RootStackParamList = {
   /** Bottom tab navigator host screen. No params. */
   Tabs: undefined;
-  /** Character detail screen. */
   CharacterDetail: { characterId: number };
-  /** Episode detail screen. */
   EpisodeDetail: { episodeId: number };
-  /** Location detail screen. */
   LocationDetail: { locationId: number };
 };
 
@@ -41,8 +36,6 @@ export type TabParamList = {
   LocationList: undefined;
   Favourites: undefined;
 };
-
-// ─── Navigators ──────────────────────────────────────────────────────────────
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
